@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Date-range calendar</title>
+    <link rel="stylesheet" type="text/css" href="css/default.css"/>
+    <link rel="stylesheet" href="css/scaffolding.css">
+    <script src="js/date-range-calendar.js"></script>
+</head>
+<body>
+    <div class="debug main-container display-table">
+        <div class="display-table-cell parent-half-width month-container">
+            <div id="calendar-container"></div>
+        </div>
+        <div class="display-table-cell parent-half-width month-container"></div>
+    </div>
+
+    <script>
+        Calendar.initialize();
+        Calendar.generateMonth(3);
+    </script>
+
+    <script type='text/javascript' id="__bs_script__">//<![CDATA[
+    document.write("<script async src='http://HOST:3000/browser-sync/browser-sync-client.2.11.1.js'><\/script>".replace("HOST", location.hostname));
+    //]]></script>
+</body>
+</html>
