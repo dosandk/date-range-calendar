@@ -60,6 +60,7 @@
     vertical-align: bottom;
 }
 
-.to-center-inline {
+.to-center-inline,
+.txt-align-center {
     text-align: center;
 }
