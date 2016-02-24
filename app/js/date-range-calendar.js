@@ -60,21 +60,51 @@
         },
         creteMonthCalendar: function(month) {
             var self = this;
+            var currentMont = typeof month !== 'undefined' ? month : new Date().getMonth();
             var table = dom.createElement('table');
             var daysPerWeek = self.config.daysPerWeek;
             var daysCounter = 1;
             var daysNames = self.config.daysNames;
-            var startIndex = daysNames.indexOf(daysNames[dateHelper.getMonthFirstDay(month).getDay()]) + 1;
+            var startIndex = daysNames.indexOf(daysNames[dateHelper.getMonthFirstDay(currentMont).getDay()]) + 1;
             var startCounter = 0;
 
             dom.addClass(table, 'fixed-table-layout parent-width txt-align-center');
 
             function createTableCaption() {
-                var monthName = self.config.monthNames[month];
+                var monthName = self.config.monthNames[currentMont];
                 var tableCaption = dom.createElement('caption');
                 var text = document.createTextNode(monthName);
 
+                function createNavigation() {
+                    var leftArrow = dom.createElement('span');
+                    var leftArrowIcon = document.createTextNode('<<');
+
+                    dom.addClass(leftArrow, 'js-arrow-left-' + currentMont);
+
+                    leftArrow.setAttribute('data-month', currentMont);
+                    leftArrow.setAttribute('data-state', 'prev');
+                    leftArrow.appendChild(leftArrowIcon);
+
+                    var rightArrow = dom.createElement('span');
+                    var rightArrowIcon = document.createTextNode('>>');
+
+                    dom.addClass(rightArrow, 'js-arrow-right-' + currentMont);
+
+                    rightArrow.setAttribute('data-month', currentMont);
+                    rightArrow.setAttribute('data-state', 'next');
+                    rightArrow.appendChild(rightArrowIcon);
+
+                    return {
+                        leftArrow: leftArrow,
+                        rightArrow: rightArrow
+                    }
+                }
+
+                var arrows = createNavigation();
+
+                tableCaption.appendChild(arrows.leftArrow);
                 tableCaption.appendChild(text);
+                tableCaption.appendChild(arrows.rightArrow);
 
                 return tableCaption;
             }
@@ -193,6 +223,37 @@
             for (var i = 0; i < fields.length; i++) {
                 document.querySelector(fields[i]).appendChild(fragments[i])
             }
+        },
+        initListeners: function() {
+            var self = this;
+            var arrows = document.querySelectorAll('span[class^="js-arrow-"]');
+            var arrowIndex = arrows.length;
+
+            while (arrowIndex--) {
+                arrows[arrowIndex].addEventListener('click', function(e) {
+                    var month = parseInt(e.currentTarget.getAttribute('data-month'), 10);
+                    var state = e.currentTarget.getAttribute('data-state');
+                    var nextMonth;
+
+                    switch (state) {
+                        case 'prev':
+                            nextMonth = month - 1;
+                            break;
+                        case 'next':
+                            nextMonth = month + 1;
+                            break;
+                    }
+
+                    var newCalendar = self.creteMonthCalendar(nextMonth);
+                    var container = document.querySelector('.side-0');
+
+                    container.innerHTML = '';
+
+                    container.appendChild(newCalendar);
+
+                    self.initListeners();
+                });
+            }
         }
     };
 
@@ -202,6 +263,7 @@
         },
         generateMonth: function(month) {
             calendar.render(month);
+            calendar.initListeners();
         }
     }
 }));
