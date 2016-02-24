@@ -20,7 +20,7 @@
             var currentYear = typeof year !== 'undefined' ?  year : date.getFullYear();
             var currentMonth = typeof month !== 'undefined' ? month : date.getMonth();
 
-            return new Date(currentYear, currentMonth, 0).getDate();
+            return new Date(currentYear, currentMonth + 1, 0).getDate();
         },
         getMonthFirstDay: function(month, year) {
             var self = this;
@@ -60,18 +60,18 @@
         },
         creteMonthCalendar: function(month) {
             var self = this;
-            var currentMont = typeof month !== 'undefined' ? month : new Date().getMonth();
+            var currentMonth = typeof month !== 'undefined' ? month : new Date().getMonth();
             var table = dom.createElement('table');
             var daysPerWeek = self.config.daysPerWeek;
             var daysCounter = 1;
             var daysNames = self.config.daysNames;
-            var startIndex = daysNames.indexOf(daysNames[dateHelper.getMonthFirstDay(currentMont).getDay()]) + 1;
+            var startIndex = daysNames.indexOf(daysNames[dateHelper.getMonthFirstDay(currentMonth).getDay()]) + 1;
             var startCounter = 0;
 
             dom.addClass(table, 'fixed-table-layout parent-width txt-align-center');
 
             function createTableCaption() {
-                var monthName = self.config.monthNames[currentMont];
+                var monthName = self.config.monthNames[currentMonth];
                 var tableCaption = dom.createElement('caption');
                 var text = document.createTextNode(monthName);
 
@@ -79,18 +79,18 @@
                     var leftArrow = dom.createElement('span');
                     var leftArrowIcon = document.createTextNode('<<');
 
-                    dom.addClass(leftArrow, 'js-arrow-left-' + currentMont);
+                    dom.addClass(leftArrow, 'js-arrow-left-' + currentMonth);
 
-                    leftArrow.setAttribute('data-month', currentMont);
+                    leftArrow.setAttribute('data-month', currentMonth);
                     leftArrow.setAttribute('data-state', 'prev');
                     leftArrow.appendChild(leftArrowIcon);
 
                     var rightArrow = dom.createElement('span');
                     var rightArrowIcon = document.createTextNode('>>');
 
-                    dom.addClass(rightArrow, 'js-arrow-right-' + currentMont);
+                    dom.addClass(rightArrow, 'js-arrow-right-' + currentMonth);
 
-                    rightArrow.setAttribute('data-month', currentMont);
+                    rightArrow.setAttribute('data-month', currentMonth);
                     rightArrow.setAttribute('data-state', 'next');
                     rightArrow.appendChild(rightArrowIcon);
 
@@ -206,11 +206,11 @@
         },
         createCalendarFragments: function(month) {
             var self = this;
-            var currentMont = typeof month !== 'undefined' ? month : new Date().getMonth();
+            var currentMonth = typeof month !== 'undefined' ? month : new Date().getMonth();
             var fragments = [];
 
             for (var i = 0; i < self.config.fragmentsNumber; i++) {
-                fragments.push(self.creteMonthCalendar(currentMont++));
+                fragments.push(self.creteMonthCalendar(currentMonth++));
             }
 
             return fragments;
