@@ -59,14 +59,16 @@
             monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
         },
         fragmentsManager: {},
-        creteMonthCalendar: function(month) {
+        creteMonthCalendar: function(month, year) {
             var self = this;
-            var currentMonth = month || self.month;
+            var currentMonth = typeof month !== 'undefined' ? month : self.month;
+            var currentYear = typeof year !== 'undefined' ? year : self.year;
+
             var table = dom.createElement('table');
             var daysPerWeek = self.config.daysPerWeek;
             var daysCounter = 1;
             var daysNames = self.config.daysNames;
-            var startIndex = daysNames.indexOf(daysNames[dateHelper.getMonthFirstDay(currentMonth).getDay()]) + 1;
+            var startIndex = daysNames.indexOf(daysNames[dateHelper.getMonthFirstDay(currentMonth, currentYear).getDay()]) + 1;
             var startCounter = 0;
 
             dom.addClass(table, 'fixed-table-layout parent-width txt-align-center');
@@ -74,7 +76,7 @@
             function createTableCaption() {
                 var monthName = self.config.monthNames[currentMonth];
                 var tableCaption = dom.createElement('caption');
-                var text = document.createTextNode(monthName);
+                var text = document.createTextNode(monthName + ' ' + currentYear);
 
                 function createNavigation() {
                     var leftArrow = dom.createElement('span');
@@ -84,6 +86,7 @@
 
                     leftArrow.setAttribute('data-month', currentMonth);
                     leftArrow.setAttribute('data-state', 'prev');
+                    leftArrow.setAttribute('data-year', currentYear);
                     leftArrow.appendChild(leftArrowIcon);
 
                     var rightArrow = dom.createElement('span');
@@ -93,6 +96,7 @@
 
                     rightArrow.setAttribute('data-month', currentMonth);
                     rightArrow.setAttribute('data-state', 'next');
+                    rightArrow.setAttribute('data-year', currentYear);
                     rightArrow.appendChild(rightArrowIcon);
 
                     return {
@@ -129,7 +133,7 @@
 
             function createTableBody() {
                 var tableBody = dom.createElement('tbody');
-                var daysInMonth = dateHelper.getNumberDaysInMonth(month);
+                var daysInMonth = dateHelper.getNumberDaysInMonth(currentMonth, currentYear);
                 var weeksCounter = Math.ceil(daysInMonth/daysPerWeek);
 
                 function createCells() {
@@ -184,11 +188,11 @@
 
             return table;
         },
-        createField: function(month) {
+        createField: function(month, year) {
             var self = this;
             var mainContainer = document.querySelector('.sides-container');
             var container = dom.createElement();
-            var sideName = self.fragmentsManager[month].containerClassName;
+            var sideName = self.fragmentsManager[year + '-' + month].containerClassName;
 
             dom.addClass(container, sideName.slice(1) + ' display-table-cell');
 
@@ -222,48 +226,53 @@
             var monthIndex = data.monthIndex;
             var containerClassName = data.containerClassName;
             var fragmentHtml = data.fragmentHtml;
+            var currentYear = typeof data.year !== 'undefined' ? data.year : self.year;
 
-            self.fragmentsManager[monthIndex] = {
+            self.fragmentsManager[currentYear + '-' + monthIndex] = {
+                year: currentYear,
                 name: self.config.monthNames[monthIndex],
                 index: monthIndex,
                 containerClassName: containerClassName,
                 fragmentHtml: fragmentHtml
             };
 
-            self.createField(monthIndex);
+            self.createField(monthIndex, currentYear);
         },
         updateFragmentsManager: function(data) {
             var self = this;
             var monthIndex = data.monthIndex;
             var nextMonthIndex = data.nextMonthIndex;
-            var calendarHtml = self.creteMonthCalendar(nextMonthIndex);
-            var currentCalendar = self.fragmentsManager[monthIndex];
+            var currentYear = data.year;
+            var currentCalendar = self.fragmentsManager[currentYear + '-' + monthIndex];
+            var nextYear = typeof data.nextYear !== 'undefined' ? data.nextYear : currentCalendar.year;
+            var calendarHtml = self.creteMonthCalendar(nextMonthIndex, nextYear);
 
-            if (typeof self.fragmentsManager[nextMonthIndex] !== 'undefined') {
+            if (typeof self.fragmentsManager[nextYear + '-' + nextMonthIndex] !== 'undefined') {
                 console.error('this month already exist');
             }
             else  {
+                currentCalendar.year = nextYear;
                 currentCalendar.index = nextMonthIndex;
                 currentCalendar.name = self.config.monthNames[nextMonthIndex];
                 currentCalendar.fragmentHtml = calendarHtml;
 
-                self.fragmentsManager[data.nextMonthIndex] = currentCalendar;
-                delete self.fragmentsManager[data.monthIndex];
+                self.fragmentsManager[nextYear + '-' + nextMonthIndex] = currentCalendar;
+                delete self.fragmentsManager[currentYear + '-' +monthIndex];
 
-                self.renderCalendarFragment(data.nextMonthIndex);
+                self.renderCalendarFragment(nextYear, nextMonthIndex);
             }
+
+            console.log(self.fragmentsManager);
         },
-        renderCalendarFragment: function(index) {
+        renderCalendarFragment: function(year, month) {
             var self = this;
-            var calendarObj = self.fragmentsManager[index];
+            var calendarObj = self.fragmentsManager[year + '-' + month];
             var container = document.querySelector(calendarObj.containerClassName);
 
             container.innerHTML = '';
             container.appendChild(calendarObj.fragmentHtml);
 
             self.initMonthSlider(container);
-
-            return container;
         },
         initMonthSlider: function(elem) {
             var self = this;
@@ -280,6 +289,8 @@
             var self = this;
             var month = parseInt(e.currentTarget.getAttribute('data-month'), 10);
             var state = e.currentTarget.getAttribute('data-state');
+            var currentYear = parseInt(e.currentTarget.getAttribute('data-year'), 10);
+            var nextYear;
             var nextMonth;
 
             switch (state) {
@@ -291,17 +302,28 @@
                     break;
             }
 
+            if (nextMonth < 0) {
+                nextYear = currentYear - 1;
+                nextMonth = 11;
+            }
+            else if (nextMonth > 11) {
+                nextYear = currentYear + 1;
+                nextMonth = 0;
+            }
+
             self.updateFragmentsManager({
+                year: currentYear,
+                nextYear: nextYear,
                 monthIndex: month,
                 nextMonthIndex: nextMonth
             });
 
-            console.log(self.fragmentsManager);
         },
-        render: function(month) {
+        render: function(month, year) {
             var self = this;
 
             self.month = typeof month !== 'undefined' ? month : new Date().getMonth();
+            self.year = typeof year !== 'undefined' ? year : new Date().getFullYear();
 
             self.createCalendarFragments(self.month);
 
@@ -332,10 +354,11 @@
             console.error('init calendar');
             calendar.createMainContainer();
         },
-        generateMonth: function(month) {
-            calendar.render(month);
+        generateMonth: function() {
+            var month = 0;
+            var year = 2017;
 
-            console.log(calendar.fragmentsManager);
+            calendar.render(month, year);
         }
     }
 }));
