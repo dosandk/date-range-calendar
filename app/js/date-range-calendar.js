@@ -58,6 +58,7 @@
             daysNames: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
             monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
         },
+        fragmentsManager: {},
         creteMonthCalendar: function(month) {
             var self = this;
             var currentMonth = typeof month !== 'undefined' ? month : new Date().getMonth();
@@ -183,46 +184,127 @@
 
             return table;
         },
+        createField: function(month) {
+            var self = this;
+            var mainContainer = document.querySelector('.sides-container');
+            var container = dom.createElement();
+            var sideName = self.fragmentsManager[month].containerClassName;
+
+            dom.addClass(container, sideName.slice(1) + ' display-table-cell');
+
+            mainContainer.appendChild(container);
+        },
         createFields: function() {
             var self = this;
             var mainContainer = document.getElementById('calendar-container');
             var field = dom.createElement();
-            var sidesClassNames = [];
 
-            dom.addClass(field, 'display-table parent-size');
+            dom.addClass(field, 'sides-container display-table parent-size');
             mainContainer.appendChild(field);
-
-            for (var i = 0; i < self.config.fragmentsNumber; i++) {
-                var side = dom.createElement();
-                var sideName = 'side-' + i;
-
-                dom.addClass(side, sideName + ' display-table-cell');
-                sidesClassNames.push('.' + sideName);
-
-                field.appendChild(side);
-            }
-
-            return sidesClassNames;
         },
         createCalendarFragments: function(month) {
             var self = this;
             var currentMonth = typeof month !== 'undefined' ? month : new Date().getMonth();
-            var fragments = [];
 
             for (var i = 0; i < self.config.fragmentsNumber; i++) {
-                fragments.push(self.creteMonthCalendar(currentMonth++));
-            }
+                currentMonth++;
+                var table = self.creteMonthCalendar(currentMonth);
 
-            return fragments;
+                self.updateFragmentsManager({
+                    mode: 'create',
+                    monthIndex: currentMonth,
+                    fragmentHtml: table,
+                    containerClassName: '.side-' + currentMonth
+                });
+            }
+        },
+        updateFragmentsManager: function(data) {
+            var self = this;
+            var monthIndex = data.monthIndex;
+            var containerClassName = data.containerClassName;
+            var fragmentHtml = data.fragmentHtml;
+
+            //if (Object.keys(self.fragmentsManager).length < self.config.fragmentsNumber) {
+            //    if (Object.keys(self.fragmentsManager).indexOf(monthIndex) === -1) {
+                    if (data.mode === 'create') {
+                        var properies = {
+                            name: self.config.monthNames[monthIndex],
+                            index: monthIndex,
+                            containerClassName: containerClassName,
+                            fragmentHtml: fragmentHtml
+                        };
+
+                        self.fragmentsManager[monthIndex] = properies;
+
+                        self.createField(monthIndex);
+
+                    }
+                    if (data.mode === 'update') {
+                        var calendar = self.creteMonthCalendar(data.nextMonthIndex);
+                        var currentCalendar = self.fragmentsManager[data.monthIndex];
+
+                        currentCalendar.index = data.nextMonthIndex;
+                        currentCalendar.name = self.config.monthNames[data.nextMonthIndex];
+                        currentCalendar.fragmentHtml = calendar;
+
+
+                        self.fragmentsManager[data.nextMonthIndex] = self.fragmentsManager[data.monthIndex];
+                        delete self.fragmentsManager[data.monthIndex];
+
+                        var riba = document.querySelector(currentCalendar.containerClassName);
+
+                        riba.innerHTML = '';
+
+                        riba.appendChild(currentCalendar.fragmentHtml);
+
+                        var arrows = riba.querySelectorAll('span[class^="js-arrow-"]');
+                        var arrowIndex = arrows.length;
+
+                        while (arrowIndex--) {
+                            arrows[arrowIndex].addEventListener('click', function(e) {
+
+                                console.error(123123);
+                                self.foo(e)
+                            });
+                        }
+                    }
+                //}
+            //}
         },
         render: function(month) {
             var self = this;
-            var fragments = self.createCalendarFragments(month);
-            var fields = self.createFields();
 
-            for (var i = 0; i < fields.length; i++) {
-                document.querySelector(fields[i]).appendChild(fragments[i])
+            self.createCalendarFragments(month);
+
+            for (var i in self.fragmentsManager) {
+                var fragment = self.fragmentsManager[i].fragmentHtml;
+                var field = self.fragmentsManager[i].containerClassName;
+
+                document.querySelector(field).appendChild(fragment);
             }
+
+            self.initListeners();
+        },
+        foo: function(e) {
+            var self = this;
+            var month = parseInt(e.currentTarget.getAttribute('data-month'), 10);
+            var state = e.currentTarget.getAttribute('data-state');
+            var nextMonth;
+
+            switch (state) {
+                case 'prev':
+                    nextMonth = month - 1;
+                    break;
+                case 'next':
+                    nextMonth = month + 1;
+                    break;
+            }
+
+            self.updateFragmentsManager({
+                mode: 'update',
+                monthIndex: month,
+                nextMonthIndex: nextMonth
+            });
         },
         initListeners: function() {
             var self = this;
@@ -231,27 +313,7 @@
 
             while (arrowIndex--) {
                 arrows[arrowIndex].addEventListener('click', function(e) {
-                    var month = parseInt(e.currentTarget.getAttribute('data-month'), 10);
-                    var state = e.currentTarget.getAttribute('data-state');
-                    var nextMonth;
-
-                    switch (state) {
-                        case 'prev':
-                            nextMonth = month - 1;
-                            break;
-                        case 'next':
-                            nextMonth = month + 1;
-                            break;
-                    }
-
-                    var newCalendar = self.creteMonthCalendar(nextMonth);
-                    var container = document.querySelector('.side-0');
-
-                    container.innerHTML = '';
-
-                    container.appendChild(newCalendar);
-
-                    self.initListeners();
+                    self.foo(e);
                 });
             }
         }
@@ -260,10 +322,10 @@
     return {
         initialize: function() {
             console.error('init calendar');
+            calendar.createFields();
         },
         generateMonth: function(month) {
             calendar.render(month);
-            calendar.initListeners();
         }
     }
 }));
