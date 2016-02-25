@@ -194,7 +194,7 @@
 
             mainContainer.appendChild(container);
         },
-        createFields: function() {
+        createMainContainer: function() {
             var self = this;
             var mainContainer = document.getElementById('calendar-container');
             var field = dom.createElement();
@@ -210,82 +210,73 @@
                 currentMonth++;
                 var table = self.creteMonthCalendar(currentMonth);
 
-                self.updateFragmentsManager({
-                    mode: 'create',
+                self.initFragmentsManager({
                     monthIndex: currentMonth,
                     fragmentHtml: table,
                     containerClassName: '.side-' + currentMonth
                 });
             }
         },
-        updateFragmentsManager: function(data) {
+        initFragmentsManager: function(data) {
             var self = this;
             var monthIndex = data.monthIndex;
             var containerClassName = data.containerClassName;
             var fragmentHtml = data.fragmentHtml;
 
-            //if (Object.keys(self.fragmentsManager).length < self.config.fragmentsNumber) {
-            //    if (Object.keys(self.fragmentsManager).indexOf(monthIndex) === -1) {
-                    if (data.mode === 'create') {
-                        var properies = {
-                            name: self.config.monthNames[monthIndex],
-                            index: monthIndex,
-                            containerClassName: containerClassName,
-                            fragmentHtml: fragmentHtml
-                        };
+            self.fragmentsManager[monthIndex] = {
+                name: self.config.monthNames[monthIndex],
+                index: monthIndex,
+                containerClassName: containerClassName,
+                fragmentHtml: fragmentHtml
+            };
 
-                        self.fragmentsManager[monthIndex] = properies;
-
-                        self.createField(monthIndex);
-
-                    }
-                    if (data.mode === 'update') {
-                        var calendar = self.creteMonthCalendar(data.nextMonthIndex);
-                        var currentCalendar = self.fragmentsManager[data.monthIndex];
-
-                        currentCalendar.index = data.nextMonthIndex;
-                        currentCalendar.name = self.config.monthNames[data.nextMonthIndex];
-                        currentCalendar.fragmentHtml = calendar;
-
-
-                        self.fragmentsManager[data.nextMonthIndex] = self.fragmentsManager[data.monthIndex];
-                        delete self.fragmentsManager[data.monthIndex];
-
-                        var riba = document.querySelector(currentCalendar.containerClassName);
-
-                        riba.innerHTML = '';
-
-                        riba.appendChild(currentCalendar.fragmentHtml);
-
-                        var arrows = riba.querySelectorAll('span[class^="js-arrow-"]');
-                        var arrowIndex = arrows.length;
-
-                        while (arrowIndex--) {
-                            arrows[arrowIndex].addEventListener('click', function(e) {
-
-                                console.error(123123);
-                                self.foo(e)
-                            });
-                        }
-                    }
-                //}
-            //}
+            self.createField(monthIndex);
         },
-        render: function(month) {
+        updateFragmentsManager: function(data) {
             var self = this;
+            var monthIndex = data.monthIndex;
+            var nextMonthIndex = data.nextMonthIndex;
+            var calendarHtml = self.creteMonthCalendar(nextMonthIndex);
+            var currentCalendar = self.fragmentsManager[monthIndex];
 
-            self.createCalendarFragments(month);
-
-            for (var i in self.fragmentsManager) {
-                var fragment = self.fragmentsManager[i].fragmentHtml;
-                var field = self.fragmentsManager[i].containerClassName;
-
-                document.querySelector(field).appendChild(fragment);
+            if (typeof self.fragmentsManager[nextMonthIndex] !== 'undefined') {
+                console.error('this month already exist');
             }
+            else  {
+                currentCalendar.index = nextMonthIndex;
+                currentCalendar.name = self.config.monthNames[nextMonthIndex];
+                currentCalendar.fragmentHtml = calendarHtml;
 
-            self.initListeners();
+                self.fragmentsManager[data.nextMonthIndex] = currentCalendar;
+                delete self.fragmentsManager[data.monthIndex];
+
+                self.renderCalendarFragment(data.nextMonthIndex);
+            }
         },
-        foo: function(e) {
+        renderCalendarFragment: function(index) {
+            var self = this;
+            var calendarObj = self.fragmentsManager[index];
+            var container = document.querySelector(calendarObj.containerClassName);
+
+            container.innerHTML = '';
+            container.appendChild(calendarObj.fragmentHtml);
+
+            self.initMonthSlider(container);
+
+            return container;
+        },
+        initMonthSlider: function(elem) {
+            var self = this;
+            var arrows = elem.querySelectorAll('span[class^="js-arrow-"]');
+            var arrowIndex = arrows.length;
+
+            while (arrowIndex--) {
+                arrows[arrowIndex].addEventListener('click', function(e) {
+                    self.initMonthSliderEvents(e)
+                });
+            }
+        },
+        initMonthSliderEvents: function(e) {
             var self = this;
             var month = parseInt(e.currentTarget.getAttribute('data-month'), 10);
             var state = e.currentTarget.getAttribute('data-state');
@@ -301,10 +292,25 @@
             }
 
             self.updateFragmentsManager({
-                mode: 'update',
                 monthIndex: month,
                 nextMonthIndex: nextMonth
             });
+
+            console.log(self.fragmentsManager);
+        },
+        render: function(month) {
+            var self = this;
+
+            self.createCalendarFragments(month);
+
+            for (var i in self.fragmentsManager) {
+                var fragment = self.fragmentsManager[i].fragmentHtml;
+                var field = self.fragmentsManager[i].containerClassName;
+
+                document.querySelector(field).appendChild(fragment);
+            }
+
+            self.initListeners();
         },
         initListeners: function() {
             var self = this;
@@ -313,7 +319,7 @@
 
             while (arrowIndex--) {
                 arrows[arrowIndex].addEventListener('click', function(e) {
-                    self.foo(e);
+                    self.initMonthSliderEvents(e);
                 });
             }
         }
@@ -322,10 +328,12 @@
     return {
         initialize: function() {
             console.error('init calendar');
-            calendar.createFields();
+            calendar.createMainContainer();
         },
         generateMonth: function(month) {
             calendar.render(month);
+
+            console.log(calendar.fragmentsManager);
         }
     }
 }));
