@@ -61,7 +61,7 @@
         fragmentsManager: {},
         creteMonthCalendar: function(month) {
             var self = this;
-            var currentMonth = typeof month !== 'undefined' ? month : new Date().getMonth();
+            var currentMonth = month || self.month;
             var table = dom.createElement('table');
             var daysPerWeek = self.config.daysPerWeek;
             var daysCounter = 1;
@@ -204,17 +204,17 @@
         },
         createCalendarFragments: function(month) {
             var self = this;
-            var currentMonth = typeof month !== 'undefined' ? month : new Date().getMonth();
 
             for (var i = 0; i < self.config.fragmentsNumber; i++) {
-                currentMonth++;
-                var table = self.creteMonthCalendar(currentMonth);
+                var table = self.creteMonthCalendar(month);
 
                 self.initFragmentsManager({
-                    monthIndex: currentMonth,
+                    monthIndex: month,
                     fragmentHtml: table,
-                    containerClassName: '.side-' + currentMonth
+                    containerClassName: '.side-' + month
                 });
+
+                month++;
             }
         },
         initFragmentsManager: function(data) {
@@ -301,7 +301,9 @@
         render: function(month) {
             var self = this;
 
-            self.createCalendarFragments(month);
+            self.month = typeof month !== 'undefined' ? month : new Date().getMonth();
+
+            self.createCalendarFragments(self.month);
 
             for (var i in self.fragmentsManager) {
                 var fragment = self.fragmentsManager[i].fragmentHtml;
