@@ -178,13 +178,9 @@
             var self = this;
             var currentMonth = typeof month !== 'undefined' ? month : calendar.month;
             var currentYear = typeof year !== 'undefined' ? year : calendar.year;
-
             var table = dom.createElement('table');
             var daysPerWeek = config.daysPerWeek;
-            var daysCounter = 1;
             var daysNames = config.daysNames;
-            var startIndex = daysNames.indexOf(daysNames[dateHelper.getMonthFirstDay(currentMonth, currentYear).getDay()]) + 1;
-            var startCounter = 0;
 
             dom.addClass(table, 'fixed-table-layout parent-width txt-align-center');
 
@@ -249,7 +245,10 @@
             function createTableBody() {
                 var tableBody = dom.createElement('tbody');
                 var daysInMonth = dateHelper.getNumberDaysInMonth(currentMonth, currentYear);
-                var weeksCounter = Math.ceil(daysInMonth/daysPerWeek);
+                var startCounter = 0;
+                var daysCounter = 1;
+                var startIndex = daysNames.indexOf(daysNames[dateHelper.getMonthFirstDay(currentMonth, currentYear).getDay()]) + 1;
+                var weeksCounter = Math.ceil((daysInMonth + (startIndex - 1))/daysPerWeek);
 
                 function createCells() {
                     var cells = document.createDocumentFragment();
@@ -356,8 +355,8 @@
             calendar.createCalendarContainer();
         },
         generateMonth: function() {
-            var month = 10;
-            var year = 2017;
+            var month = 1;
+            var year = 2016;
 
             calendar.render(month, year);
         }
