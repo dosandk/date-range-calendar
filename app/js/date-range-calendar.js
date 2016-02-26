@@ -58,7 +58,32 @@
             daysNames: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
             monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
         },
-        fragmentsManager: {},
+        fragmentsManager: {
+            fragments: {},
+            renderAll: function() {
+                var self = this;
+
+                for (var i in self.fragments) {
+                    var fragment = self.fragments[i].fragmentHtml;
+                    var field = self.fragments[i].containerClassName;
+
+                    document.querySelector(field).appendChild(fragment);
+                }
+            },
+            renderFragment: function(fragmentIndex) {
+                var self = this;
+
+                if (typeof fragmentIndex !== 'undefined') {
+                    var calendarObj = self.fragments[fragmentIndex];
+                    var container = document.querySelector(calendarObj.containerClassName);
+
+                    container.innerHTML = '';
+                    container.appendChild(calendarObj.fragmentHtml);
+
+                    calendar.initMonthSlider(container);
+                }
+            }
+        },
         creteMonthCalendar: function(month, year) {
             var self = this;
             var currentMonth = typeof month !== 'undefined' ? month : self.month;
@@ -192,7 +217,7 @@
             var self = this;
             var mainContainer = document.querySelector('.sides-container');
             var container = dom.createElement();
-            var sideName = self.fragmentsManager[year + '-' + month].containerClassName;
+            var sideName = self.fragmentsManager.fragments[year + '-' + month].containerClassName;
 
             dom.addClass(container, sideName.slice(1) + ' display-table-cell');
 
@@ -206,19 +231,20 @@
             dom.addClass(field, 'sides-container display-table parent-size');
             mainContainer.appendChild(field);
         },
-        createCalendarFragments: function(month) {
+        createCalendarFragments: function() {
             var self = this;
+            var currentMonth = self.month;
 
             for (var i = 0; i < self.config.fragmentsNumber; i++) {
-                var table = self.creteMonthCalendar(month);
-
                 self.initFragmentsManager({
-                    monthIndex: month,
-                    fragmentHtml: table,
-                    containerClassName: '.side-' + month
+                    monthIndex: currentMonth,
+                    fragmentHtml: self.creteMonthCalendar(currentMonth),
+                    containerClassName: '.side-' + currentMonth
                 });
 
-                month++;
+                self.createField(currentMonth, self.year);
+
+                currentMonth++;
             }
         },
         initFragmentsManager: function(data) {
@@ -228,51 +254,42 @@
             var fragmentHtml = data.fragmentHtml;
             var currentYear = typeof data.year !== 'undefined' ? data.year : self.year;
 
-            self.fragmentsManager[currentYear + '-' + monthIndex] = {
+            self.fragmentsManager.fragments[currentYear + '-' + monthIndex] = {
                 year: currentYear,
                 name: self.config.monthNames[monthIndex],
                 index: monthIndex,
                 containerClassName: containerClassName,
                 fragmentHtml: fragmentHtml
             };
-
-            self.createField(monthIndex, currentYear);
         },
         updateFragmentsManager: function(data) {
             var self = this;
             var monthIndex = data.monthIndex;
             var nextMonthIndex = data.nextMonthIndex;
             var currentYear = data.year;
-            var currentCalendar = self.fragmentsManager[currentYear + '-' + monthIndex];
+            var currentCalendar = self.fragmentsManager.fragments[currentYear + '-' + monthIndex];
             var nextYear = typeof data.nextYear !== 'undefined' ? data.nextYear : currentCalendar.year;
             var calendarHtml = self.creteMonthCalendar(nextMonthIndex, nextYear);
 
-            if (typeof self.fragmentsManager[nextYear + '-' + nextMonthIndex] !== 'undefined') {
+            if (typeof self.fragmentsManager.fragments[nextYear + '-' + nextMonthIndex] !== 'undefined') {
                 console.error('this month already exist');
             }
             else  {
+                var currentFragmentIndex = currentYear + '-' + monthIndex;
+                var nextFragmentIndex = nextYear + '-' + nextMonthIndex;
+
                 currentCalendar.year = nextYear;
                 currentCalendar.index = nextMonthIndex;
                 currentCalendar.name = self.config.monthNames[nextMonthIndex];
                 currentCalendar.fragmentHtml = calendarHtml;
 
-                self.fragmentsManager[nextYear + '-' + nextMonthIndex] = currentCalendar;
-                delete self.fragmentsManager[currentYear + '-' +monthIndex];
+                self.fragmentsManager.fragments[nextFragmentIndex] = currentCalendar;
+                delete self.fragmentsManager.fragments[currentFragmentIndex];
 
-                self.renderCalendarFragment(nextYear, nextMonthIndex);
+                self.fragmentsManager.renderFragment(nextFragmentIndex);
             }
 
             console.log(self.fragmentsManager);
-        },
-        renderCalendarFragment: function(year, month) {
-            var self = this;
-            var calendarObj = self.fragmentsManager[year + '-' + month];
-            var container = document.querySelector(calendarObj.containerClassName);
-
-            container.innerHTML = '';
-            container.appendChild(calendarObj.fragmentHtml);
-
-            self.initMonthSlider(container);
         },
         initMonthSlider: function(elem) {
             var self = this;
@@ -325,14 +342,8 @@
             self.month = typeof month !== 'undefined' ? month : new Date().getMonth();
             self.year = typeof year !== 'undefined' ? year : new Date().getFullYear();
 
-            self.createCalendarFragments(self.month);
-
-            for (var i in self.fragmentsManager) {
-                var fragment = self.fragmentsManager[i].fragmentHtml;
-                var field = self.fragmentsManager[i].containerClassName;
-
-                document.querySelector(field).appendChild(fragment);
-            }
+            self.createCalendarFragments();
+            self.fragmentsManager.renderAll();
 
             self.initListeners();
         },
@@ -355,7 +366,7 @@
             calendar.createMainContainer();
         },
         generateMonth: function() {
-            var month = 0;
+            var month = 10;
             var year = 2017;
 
             calendar.render(month, year);
