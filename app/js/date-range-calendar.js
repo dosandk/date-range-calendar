@@ -22,14 +22,14 @@
 
             return new Date(currentYear, currentMonth + 1, 0).getDate();
         },
-        getMonthFirstDay: function(month, year) {
+        /*getMonthFirstDay: function(month, year) {
             var self = this;
             var date = new Date();
             var currentYear = typeof year !== 'undefined' ?  year : date.getFullYear();
             var currentMonth = typeof month !== 'undefined' ? month : date.getMonth();
 
             return new Date(currentYear, currentMonth, 1);
-        },
+        },*/
         getMonthLastDay: function(month, year) {
             var self = this;
             var date = new Date();
@@ -109,7 +109,7 @@
 
                 document.querySelector(field).appendChild(fragment);
 
-                self.initMonthSwitchingEvent(fragment);
+                self.initListeners(fragment);
             }
         },
         renderFragment: function(fragmentIndex) {
@@ -122,7 +122,7 @@
                 container.innerHTML = '';
                 container.appendChild(calendarObj.fragmentHtml);
 
-                self.initMonthSwitchingEvent(container);
+                self.initListeners(container);
             }
         },
         setFragments: function(data) {
@@ -170,6 +170,35 @@
 
             console.log(self);
 
+        },
+        initListeners: function(elem) {
+            var self = this;
+
+            self.initMonthSwitchingEvent(elem);
+            self.initGetTimestampEvent(elem);
+        },
+        initGetTimestampEvent: function(elem) {
+            var tbody = elem.querySelector('tbody');
+
+            tbody.addEventListener('click', function(e) {
+                var target = e.target;
+                var classListArr = Array.prototype.slice.call(target.classList);
+
+                if (classListArr.indexOf('day') >= 0) {
+                    var timestamp = parseInt(target.getAttribute('data-timestamp'), 10);
+
+                    if (classListArr.indexOf('chosen') >= 0) {
+                        console.error(1);
+                        target.classList.remove('chosen');
+                    }
+                    else {
+                        console.error(2);
+                        target.classList.add('chosen');
+                    }
+
+                    console.log(timestamp);
+                }
+            });
         }
     };
 
@@ -247,8 +276,9 @@
                 var daysInMonth = dateHelper.getNumberDaysInMonth(currentMonth, currentYear);
                 var startCounter = 0;
                 var daysCounter = 1;
-                var startIndex = daysNames.indexOf(daysNames[dateHelper.getMonthFirstDay(currentMonth, currentYear).getDay()]) + 1;
-                var weeksCounter = Math.ceil((daysInMonth + (startIndex - 1))/daysPerWeek);
+                var firstDay = daysNames[new Date(currentYear, currentMonth, 1).getDay()];
+                var startIndex = daysNames.indexOf(firstDay);
+                var weeksCounter = Math.ceil((daysInMonth + startIndex)/daysPerWeek);
 
                 function createCells() {
                     var cells = document.createDocumentFragment();
@@ -257,17 +287,34 @@
                     var text;
 
                     for (dayIndex; dayIndex < daysPerWeek; dayIndex++) {
-                        startCounter++;
                         if (daysCounter <= daysInMonth) {
                             cell = dom.createElement('td');
                             text = document.createTextNode('');
 
                             if (startCounter >= startIndex) {
-                                text = document.createTextNode(daysCounter++);
+                                var date = new Date();
+                                var nowYear = date.getFullYear();
+                                var nowMonth = date.getMonth();
+                                var nowDay = date.getDate();
+                                var nowTimestamp = new Date(nowYear, nowMonth, nowDay).getTime();
+                                var dayTimestamp = new Date(currentYear, currentMonth, daysCounter).getTime();
+
+                                text = document.createTextNode(daysCounter);
+                                cell.setAttribute('data-timestamp', dayTimestamp);
+
+                                dom.addClass(cell, 'day');
+
+                                if (nowTimestamp === dayTimestamp) {
+                                    dom.addClass(cell, 'day active')
+                                }
+
+                                daysCounter++;
                             }
 
                             cell.appendChild(text);
                             cells.appendChild(cell);
+
+                            startCounter++;
                         }
                     }
 

@@ -1,8 +1,22 @@
-.main-container {
+.date-range-calendar {
     width: 500px;
     height: 200px;
 }
+.day {
+    cursor: pointer;
+}
+.day:hover {
+    background: lightskyblue;
+}
 
-.date-range-calendar {
+.day.chosen {
+    background: dodgerblue;
+}
 
+.day.chosen.active {
+    background: #114e88;
+}
+
+.active {
+    background: gainsboro;
 }
