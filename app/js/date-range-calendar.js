@@ -130,7 +130,7 @@
             var monthIndex = data.monthIndex;
             var containerClassName = data.containerClassName;
             var fragmentHtml = data.fragmentHtml;
-            var currentYear = typeof data.year !== 'undefined' ? data.year : calendar.year;
+            var currentYear = data.year;
             var fragmentIndex = currentYear + '-' + monthIndex;
 
             self.fragments[fragmentIndex] = {
@@ -315,7 +315,6 @@
 
     var calendar = {
         createCalendarContainer: function() {
-            var self = this;
             var mainContainer = document.getElementById('calendar-container');
             var field = dom.createElement();
 
@@ -325,24 +324,32 @@
         initFragments: function() {
             var self = this;
             var currentMonth = self.month;
+            var currentYear = self.year;
 
             for (var i = 0; i < config.fragmentsNumber; i++) {
                 fragmentsManager.setFragments({
+                    year: currentYear,
                     monthIndex: currentMonth,
-                    fragmentHtml: fragmentsFactory.creteFragment(currentMonth),
+                    fragmentHtml: fragmentsFactory.creteFragment(currentMonth, currentYear),
                     containerClassName: '.side-' + currentMonth
                 });
 
-                fragmentsFactory.creteFragmentContainer(currentMonth, self.year);
+                fragmentsFactory.creteFragmentContainer(currentMonth, currentYear);
 
-                currentMonth++;
+                if (currentMonth < 11) {
+                    currentMonth++;
+                }
+                else {
+                    currentYear++;
+                    currentMonth = 0;
+                }
             }
         },
         render: function(month, year) {
             var self = this;
 
-            self.month = typeof month !== 'undefined' ? month : new Date().getMonth();
-            self.year = typeof year !== 'undefined' ? year : new Date().getFullYear();
+            self.month = month;
+            self.year = year;
 
             self.initFragments();
             fragmentsManager.renderAllFragments();
