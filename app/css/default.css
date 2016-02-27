@@ -9,11 +9,11 @@
     background: lightskyblue;
 }
 
-.day.chosen {
+.day.selected {
     background: dodgerblue;
 }
 
-.day.chosen.active {
+.day.selected.active {
     background: #114e88;
 }
 

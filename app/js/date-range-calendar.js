@@ -60,6 +60,10 @@
 
     var fragmentsManager = {
         fragments: {},
+        selectedDateRange: {
+            start: null,
+            end: null
+        },
         initMonthSwitchingEvent: function(elem) {
             var self = this;
             var arrows = elem.querySelectorAll('span[class^="js-arrow-"]');
@@ -178,6 +182,7 @@
             self.initGetTimestampEvent(elem);
         },
         initGetTimestampEvent: function(elem) {
+            var self = this;
             var tbody = elem.querySelector('tbody');
 
             tbody.addEventListener('click', function(e) {
@@ -187,16 +192,32 @@
                 if (classListArr.indexOf('day') >= 0) {
                     var timestamp = parseInt(target.getAttribute('data-timestamp'), 10);
 
-                    if (classListArr.indexOf('chosen') >= 0) {
-                        console.error(1);
-                        target.classList.remove('chosen');
+                    if (classListArr.indexOf('selected') >= 0) {
+                        target.classList.remove('selected');
                     }
                     else {
-                        console.error(2);
-                        target.classList.add('chosen');
-                    }
+                        if (self.selectedDateRange.start && self.selectedDateRange.end) {
+                            self.selectedDateRange.start = null;
+                            self.selectedDateRange.end = null;
 
-                    console.log(timestamp);
+                            var sidesContainer = document.querySelector('.sides-container');
+                            var selectedDays = sidesContainer.querySelectorAll('.selected');
+                            var selectedDaysArr = Array.prototype.slice.call(selectedDays);
+
+                            selectedDaysArr.forEach(function(cell) {
+                                cell.classList.remove('selected');
+                            });
+                        }
+
+                        if (!self.selectedDateRange.start) {
+                            self.selectedDateRange.start = timestamp;
+                        }
+                        else if (!self.selectedDateRange.end) {
+                            self.selectedDateRange.end = timestamp;
+                        }
+
+                        target.classList.add('selected');
+                    }
                 }
             });
         }
@@ -306,6 +327,14 @@
 
                                 if (nowTimestamp === dayTimestamp) {
                                     dom.addClass(cell, 'day active')
+                                }
+
+                                if (fragmentsManager.selectedDateRange.start === dayTimestamp) {
+                                    dom.addClass(cell, 'day selected')
+                                }
+
+                                if (fragmentsManager.selectedDateRange.end === dayTimestamp) {
+                                    dom.addClass(cell, 'day selected')
                                 }
 
                                 daysCounter++;
