@@ -197,11 +197,11 @@
 
                         target.classList.remove('selected');
 
-                        if (self.selectedDateRange.start === targetTimestamp) {
+                        if (targetTimestamp === self.selectedDateRange.start) {
                             self.selectedDateRange.start = self.selectedDateRange.end;
                             self.selectedDateRange.end = null;
                         }
-                        if (self.selectedDateRange.end === targetTimestamp) {
+                        else if (targetTimestamp === self.selectedDateRange.end) {
                             self.selectedDateRange.end = null;
                         }
                     }
@@ -339,18 +339,29 @@
                                 text = document.createTextNode(daysCounter);
                                 cell.setAttribute('data-timestamp', dayTimestamp);
 
-                                dom.addClass(cell, 'day');
+                                cell.classList.add('day');
 
                                 if (nowTimestamp === dayTimestamp) {
-                                    dom.addClass(cell, 'day active')
+                                    cell.classList.add('active');
                                 }
 
-                                if (fragmentsManager.selectedDateRange.start === dayTimestamp) {
-                                    dom.addClass(cell, 'day selected')
+                                var start = fragmentsManager.selectedDateRange.start;
+                                var end = fragmentsManager.selectedDateRange.end;
+
+                                if (daysCounter === 2) {
+                                    console.log('start', start);
+                                    console.log('end', end);
+                                    console.log('dayTimestamp', dayTimestamp);
                                 }
 
-                                if (fragmentsManager.selectedDateRange.end === dayTimestamp) {
-                                    dom.addClass(cell, 'day selected')
+                                if (dayTimestamp === start || dayTimestamp === end) {
+                                    cell.classList.add('selected');
+                                }
+                                else if (dayTimestamp > start && dayTimestamp < end) {
+                                    cell.classList.add('hovered');
+                                }
+                                else if (dayTimestamp < start && dayTimestamp > end) {
+                                    cell.classList.add('hovered');
                                 }
 
                                 daysCounter++;
@@ -458,7 +469,10 @@
             var sidesContainer = document.querySelector('.sides-container');
 
             sidesContainer.addEventListener('mouseover', function(e) {
-                if (fragmentsManager.selectedDateRange.start && !fragmentsManager.selectedDateRange.end) {
+                var start = fragmentsManager.selectedDateRange.start;
+                var end = fragmentsManager.selectedDateRange.end;
+
+                if (start && !end) {
                     var target = e.target;
                     var targetClassList = target.classList;
                     var targetClassListArr = Array.prototype.slice.call(targetClassList);
@@ -479,11 +493,12 @@
 
             cellsArr.forEach(function(cell) {
                 var cellTimestamp = parseInt(cell.getAttribute('data-timestamp'), 10);
+                var start = fragmentsManager.selectedDateRange.start;
 
-                if (cellTimestamp < timestamp && cellTimestamp > fragmentsManager.selectedDateRange.start) {
+                if (cellTimestamp < timestamp && cellTimestamp > start) {
                     cell.classList.add('hovered');
                 }
-                else if (cellTimestamp > timestamp && cellTimestamp < fragmentsManager.selectedDateRange.start) {
+                else if (cellTimestamp > timestamp && cellTimestamp < start) {
                     cell.classList.add('hovered');
                 }
                 else {
