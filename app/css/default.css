@@ -13,6 +13,10 @@
     background: dodgerblue;
 }
 
+.day.hovered {
+    background: pink;
+}
+
 .day.selected.active {
     background: #114e88;
 }

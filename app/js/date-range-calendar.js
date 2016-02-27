@@ -193,7 +193,17 @@
                     var timestamp = parseInt(target.getAttribute('data-timestamp'), 10);
 
                     if (classListArr.indexOf('selected') >= 0) {
+                        var targetTimestamp = parseInt(target.getAttribute('data-timestamp'), 10);
+
                         target.classList.remove('selected');
+
+                        if (self.selectedDateRange.start === targetTimestamp) {
+                            self.selectedDateRange.start = self.selectedDateRange.end;
+                            self.selectedDateRange.end = null;
+                        }
+                        if (self.selectedDateRange.end === targetTimestamp) {
+                            self.selectedDateRange.end = null;
+                        }
                     }
                     else {
                         if (self.selectedDateRange.start && self.selectedDateRange.end) {
@@ -202,10 +212,16 @@
 
                             var sidesContainer = document.querySelector('.sides-container');
                             var selectedDays = sidesContainer.querySelectorAll('.selected');
+                            var hoveredDays = sidesContainer.querySelectorAll('.hovered');
+                            var hoveredDaysArr = Array.prototype.slice.call(hoveredDays);
                             var selectedDaysArr = Array.prototype.slice.call(selectedDays);
 
                             selectedDaysArr.forEach(function(cell) {
                                 cell.classList.remove('selected');
+                            });
+
+                            hoveredDaysArr.forEach(function(cell) {
+                                cell.classList.remove('hovered');
                             });
                         }
 
@@ -429,6 +445,51 @@
 
             self.initFragments();
             fragmentsManager.renderAllFragments();
+
+            self.initListeners();
+        },
+        initListeners: function() {
+            var self = this;
+
+            self.initCellHoverEffect();
+        },
+        initCellHoverEffect: function() {
+            var self = this;
+            var sidesContainer = document.querySelector('.sides-container');
+
+            sidesContainer.addEventListener('mouseover', function(e) {
+                if (fragmentsManager.selectedDateRange.start && !fragmentsManager.selectedDateRange.end) {
+                    var target = e.target;
+                    var targetClassList = target.classList;
+                    var targetClassListArr = Array.prototype.slice.call(targetClassList);
+
+                    if (targetClassListArr.indexOf('day') >= 0) {
+                        var timestamp = parseInt(e.target.getAttribute('data-timestamp'), 10);
+
+                        self.hoverCells(timestamp);
+                    }
+                }
+            });
+
+        },
+        hoverCells: function(timestamp) {
+            var sidesContainer = document.querySelector('.sides-container');
+            var cells = sidesContainer.querySelectorAll('.day');
+            var cellsArr = Array.prototype.slice.call(cells);
+
+            cellsArr.forEach(function(cell) {
+                var cellTimestamp = parseInt(cell.getAttribute('data-timestamp'), 10);
+
+                if (cellTimestamp < timestamp && cellTimestamp > fragmentsManager.selectedDateRange.start) {
+                    cell.classList.add('hovered');
+                }
+                else if (cellTimestamp > timestamp && cellTimestamp < fragmentsManager.selectedDateRange.start) {
+                    cell.classList.add('hovered');
+                }
+                else {
+                    cell.classList.remove('hovered');
+                }
+            });
         }
     };
 
