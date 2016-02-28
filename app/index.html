@@ -10,12 +10,26 @@
 </head>
 <body>
     <div class="debug date-range-calendar">
-        <div id="calendar-container"></div>
+        <div id="custom-selector"></div>
+    </div>
+    <div>
+        ====================
+    </div>
+    <div class="debug date-range-calendar">
+        <div class="date-range-picker"></div>
     </div>
 
     <script>
-        Calendar.initialize();
-        Calendar.generateMonth(1);
+        Calendar.initialize({
+            element: '#custom-selector',
+            year: 2017,
+            month: 4
+        });
+
+        Calendar.initialize({
+            year: 2019,
+            month: 4
+        });
     </script>
 
     <script type='text/javascript' id="__bs_script__">//<![CDATA[

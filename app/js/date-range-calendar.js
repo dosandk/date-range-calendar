@@ -51,12 +51,34 @@
         }
     };
 
-    var config = {
+    var defaultConfig = {
+        element: '.date-range-picker',
+        year: new Date().getFullYear(),
+        month: new Date().getMonth(),
         fragmentsNumber: 2,
         daysPerWeek: 7,
         daysNames: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
         monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     };
+
+    function extendConfig(customConf) {
+        var configExtended = defaultConfig;
+
+        if (typeof customConf !== 'undefined') {
+            configExtended = {};
+
+            for (var prop in defaultConfig) {
+                if (customConf[prop]) {
+                    configExtended[prop] = customConf[prop];
+                }
+                else {
+                    configExtended[prop] = defaultConfig[prop];
+                }
+            }
+        }
+
+        return configExtended;
+    }
 
     var fragmentsManager = {
         fragments: {},
@@ -106,12 +128,13 @@
         },
         renderAllFragments: function() {
             var self = this;
+            var mainContainer = document.querySelector(calendar.config.element);
 
             for (var i in self.fragments) {
                 var fragment = self.fragments[i].fragmentHtml;
                 var field = self.fragments[i].containerClassName;
 
-                document.querySelector(field).appendChild(fragment);
+                mainContainer.querySelector(field).appendChild(fragment);
 
                 self.initListeners(fragment);
             }
@@ -121,7 +144,8 @@
 
             if (typeof fragmentIndex !== 'undefined') {
                 var calendarObj = self.fragments[fragmentIndex];
-                var container = document.querySelector(calendarObj.containerClassName);
+                var mainContainer = document.querySelector(calendar.config.element);
+                var container = mainContainer.querySelector(calendarObj.containerClassName);
 
                 container.innerHTML = '';
                 container.appendChild(calendarObj.fragmentHtml);
@@ -139,7 +163,7 @@
 
             self.fragments[fragmentIndex] = {
                 year: currentYear,
-                name: config.monthNames[monthIndex],
+                name: calendar.config.monthNames[monthIndex],
                 index: monthIndex,
                 containerClassName: containerClassName,
                 fragmentHtml: fragmentHtml
@@ -163,7 +187,7 @@
 
                 currentCalendar.year = nextYear;
                 currentCalendar.index = nextMonthIndex;
-                currentCalendar.name = config.monthNames[nextMonthIndex];
+                currentCalendar.name = calendar.config.monthNames[nextMonthIndex];
                 currentCalendar.fragmentHtml = calendarHtml;
 
                 self.fragments[nextFragmentIndex] = currentCalendar;
@@ -261,13 +285,13 @@
             var currentMonth = typeof month !== 'undefined' ? month : calendar.month;
             var currentYear = typeof year !== 'undefined' ? year : calendar.year;
             var table = dom.createElement('table');
-            var daysPerWeek = config.daysPerWeek;
-            var daysNames = config.daysNames;
+            var daysPerWeek = calendar.config.daysPerWeek;
+            var daysNames = calendar.config.daysNames;
 
             dom.addClass(table, 'fixed-table-layout parent-width txt-align-center');
 
             function createTableCaption() {
-                var monthName = config.monthNames[currentMonth];
+                var monthName = calendar.config.monthNames[currentMonth];
                 var tableCaption = dom.createElement('caption');
                 var text = document.createTextNode(monthName + ' ' + currentYear);
 
@@ -413,22 +437,25 @@
             return table;
         },
         creteFragmentContainer: function(month, year) {
-            var mainContainer = document.querySelector('.sides-container');
+            var mainContainer = document.querySelector(calendar.config.element);
+            var sidesContainer = mainContainer.querySelector('.sides-container');
             var container = dom.createElement();
             var sideName = fragmentsManager.fragments[year + '-' + month].containerClassName;
 
             dom.addClass(container, sideName.slice(1) + ' display-table-cell');
 
-            mainContainer.appendChild(container);
+            sidesContainer.appendChild(container);
         }
     };
 
     var calendar = {
         createCalendarContainer: function() {
-            var mainContainer = document.getElementById('calendar-container');
+            var self = this;
+            var element = self.config.element;
+            var mainContainer = document.querySelector(element);
             var field = dom.createElement();
 
-            dom.addClass(field, 'sides-container display-table parent-size');
+            field.classList.add('sides-container', 'display-table', 'parent-size');
             mainContainer.appendChild(field);
         },
         initFragments: function() {
@@ -436,7 +463,7 @@
             var currentMonth = self.month;
             var currentYear = self.year;
 
-            for (var i = 0; i < config.fragmentsNumber; i++) {
+            for (var i = 0; i < self.config.fragmentsNumber; i++) {
                 fragmentsManager.setFragments({
                     year: currentYear,
                     monthIndex: currentMonth,
@@ -455,11 +482,11 @@
                 }
             }
         },
-        render: function(month, year) {
+        render: function() {
             var self = this;
 
-            self.month = month;
-            self.year = year;
+            self.month = calendar.config.month;
+            self.year = calendar.config.year;
 
             self.initFragments();
             fragmentsManager.renderAllFragments();
@@ -516,15 +543,19 @@
     };
 
     return {
-        initialize: function() {
+        initialize: function(config) {
             console.error('init calendar');
-            calendar.createCalendarContainer();
-        },
-        generateMonth: function() {
-            var month = 1;
-            var year = 2016;
+            calendar.config = {};
+            calendar.month = null;
+            calendar.year = null;
 
-            calendar.render(month, year);
+            fragmentsManager.fragments = {};
+            fragmentsManager.selectedDateRange.start = null;
+            fragmentsManager.selectedDateRange.end = null;
+
+            calendar.config = extendConfig(config);
+            calendar.createCalendarContainer();
+            calendar.render();
         }
     }
 }));
