@@ -80,13 +80,16 @@
         return configExtended;
     }
 
-    var fragmentsManager = {
-        fragments: {},
-        selectedDateRange: {
+    var FragmentsManager = function (data) {
+        this.parent = data.parent;
+        this.fragments = {};
+
+        this.selectedDateRange = {
             start: null,
             end: null
-        },
-        initMonthSwitchingEvent: function(elem) {
+        };
+
+        this.initMonthSwitchingEvent = function(elem) {
             var self = this;
             var arrows = elem.querySelectorAll('span[class^="js-arrow-"]');
             var arrowIndex = arrows.length;
@@ -125,10 +128,11 @@
                     });
                 });
             }
-        },
-        renderAllFragments: function() {
+        };
+
+        this.renderAllFragments = function() {
             var self = this;
-            var mainContainer = document.querySelector(calendar.config.element);
+            var mainContainer = document.querySelector(self.parent.config.element);
 
             for (var i in self.fragments) {
                 var fragment = self.fragments[i].fragmentHtml;
@@ -138,13 +142,14 @@
 
                 self.initListeners(fragment);
             }
-        },
-        renderFragment: function(fragmentIndex) {
+        };
+
+        this.renderFragment = function(fragmentIndex) {
             var self = this;
 
             if (typeof fragmentIndex !== 'undefined') {
                 var calendarObj = self.fragments[fragmentIndex];
-                var mainContainer = document.querySelector(calendar.config.element);
+                var mainContainer = document.querySelector(self.parent.config.element);
                 var container = mainContainer.querySelector(calendarObj.containerClassName);
 
                 container.innerHTML = '';
@@ -152,8 +157,9 @@
 
                 self.initListeners(container);
             }
-        },
-        setFragments: function(data) {
+        };
+
+        this.setFragments = function(data) {
             var self = this;
             var monthIndex = data.monthIndex;
             var containerClassName = data.containerClassName;
@@ -163,20 +169,21 @@
 
             self.fragments[fragmentIndex] = {
                 year: currentYear,
-                name: calendar.config.monthNames[monthIndex],
+                name: self.parent.config.monthNames[monthIndex],
                 index: monthIndex,
                 containerClassName: containerClassName,
                 fragmentHtml: fragmentHtml
             };
-        },
-        updateFragment: function(data) {
+        };
+
+        this.updateFragment = function(data) {
             var self = this;
             var monthIndex = data.monthIndex;
             var nextMonthIndex = data.nextMonthIndex;
             var currentYear = data.year;
             var currentCalendar = self.fragments[currentYear + '-' + monthIndex];
             var nextYear = typeof data.nextYear !== 'undefined' ? data.nextYear : currentCalendar.year;
-            var calendarHtml = fragmentsFactory.creteFragment(nextMonthIndex, nextYear);
+            var calendarHtml = self.parent.fragmentsFactory.creteFragment(nextMonthIndex, nextYear);
 
             if (typeof self.fragments[nextYear + '-' + nextMonthIndex] !== 'undefined') {
                 console.error('this month already exist');
@@ -187,7 +194,7 @@
 
                 currentCalendar.year = nextYear;
                 currentCalendar.index = nextMonthIndex;
-                currentCalendar.name = calendar.config.monthNames[nextMonthIndex];
+                currentCalendar.name = self.parent.config.monthNames[nextMonthIndex];
                 currentCalendar.fragmentHtml = calendarHtml;
 
                 self.fragments[nextFragmentIndex] = currentCalendar;
@@ -195,14 +202,16 @@
 
                 self.renderFragment(nextFragmentIndex);
             }
-        },
-        initListeners: function(elem) {
+        };
+
+        this.initListeners = function(elem) {
             var self = this;
 
             self.initMonthSwitchingEvent(elem);
             self.initGetTimestampEvent(elem);
-        },
-        initGetTimestampEvent: function(elem) {
+        };
+
+        this.initGetTimestampEvent = function(elem) {
             var self = this;
             var tbody = elem.querySelector('tbody');
 
@@ -226,8 +235,9 @@
                     }
                 }
             });
-        },
-        setDateRange: function(timestamp) {
+        };
+
+        this.setDateRange = function(timestamp) {
             var self = this;
 
             if (!self.selectedDateRange.start) {
@@ -242,16 +252,17 @@
                     self.selectedDateRange.end = timestamp;
                 }
             }
+        };
 
-        },
-        resetDateRange: function() {
+        this.resetDateRange = function() {
             var self = this;
 
             if (self.selectedDateRange.start && self.selectedDateRange.end) {
                 self.selectedDateRange.start = null;
                 self.selectedDateRange.end = null;
 
-                var sidesContainer = document.querySelector('.sides-container');
+                var mainContainer = document.querySelector(self.parent.config.element);
+                var sidesContainer = mainContainer.querySelector('.sides-container');
                 var selectedDays = sidesContainer.querySelectorAll('.selected');
                 var hoveredDays = sidesContainer.querySelectorAll('.hovered');
                 var hoveredDaysArr = Array.prototype.slice.call(hoveredDays);
@@ -265,8 +276,9 @@
                     cell.classList.remove('hovered');
                 });
             }
-        },
-        updateDateRange: function(timestamp) {
+        };
+
+        this.updateDateRange = function(timestamp) {
             var self = this;
 
             if (timestamp === self.selectedDateRange.start) {
@@ -279,19 +291,21 @@
         }
     };
 
-    var fragmentsFactory = {
-        creteFragment: function(month, year) {
+    var FragmentsFactory = function(data) {
+        this.parent = data.parent;
+
+        this.creteFragment = function(month, year) {
             var self = this;
-            var currentMonth = typeof month !== 'undefined' ? month : calendar.month;
-            var currentYear = typeof year !== 'undefined' ? year : calendar.year;
+            var currentMonth = typeof month !== 'undefined' ? month : self.parent.month;
+            var currentYear = typeof year !== 'undefined' ? year : self.parent.year;
             var table = dom.createElement('table');
-            var daysPerWeek = calendar.config.daysPerWeek;
-            var daysNames = calendar.config.daysNames;
+            var daysPerWeek = self.parent.config.daysPerWeek;
+            var daysNames = self.parent.config.daysNames;
 
             dom.addClass(table, 'fixed-table-layout parent-width txt-align-center');
 
             function createTableCaption() {
-                var monthName = calendar.config.monthNames[currentMonth];
+                var monthName = self.parent.config.monthNames[currentMonth];
                 var tableCaption = dom.createElement('caption');
                 var text = document.createTextNode(monthName + ' ' + currentYear);
 
@@ -385,8 +399,8 @@
                                     cell.classList.add('active');
                                 }
 
-                                var start = fragmentsManager.selectedDateRange.start;
-                                var end = fragmentsManager.selectedDateRange.end;
+                                var start = self.parent.fragmentsManager.selectedDateRange.start;
+                                var end = self.parent.fragmentsManager.selectedDateRange.end;
 
                                 if (dayTimestamp === start || dayTimestamp === end) {
                                     cell.classList.add('selected');
@@ -435,12 +449,14 @@
             table.appendChild(createTableBody());
 
             return table;
-        },
-        creteFragmentContainer: function(month, year) {
-            var mainContainer = document.querySelector(calendar.config.element);
+        };
+
+        this.creteFragmentContainer = function(month, year) {
+            var self = this;
+            var mainContainer = document.querySelector(self.parent.config.element);
             var sidesContainer = mainContainer.querySelector('.sides-container');
             var container = dom.createElement();
-            var sideName = fragmentsManager.fragments[year + '-' + month].containerClassName;
+            var sideName = self.parent.fragmentsManager.fragments[year + '-' + month].containerClassName;
 
             dom.addClass(container, sideName.slice(1) + ' display-table-cell');
 
@@ -448,30 +464,34 @@
         }
     };
 
-    var calendar = {
-        createCalendarContainer: function() {
+    var Calendar = function(config) {
+        this.config = extendConfig(config);
+        this.fragmentsManager = new FragmentsManager({parent: this});
+        this.fragmentsFactory = new FragmentsFactory({parent: this});
+
+        this.createCalendarContainer = function() {
             var self = this;
-            var element = self.config.element;
-            var mainContainer = document.querySelector(element);
+            var mainContainer = document.querySelector(self.config.element);
             var field = dom.createElement();
 
             field.classList.add('sides-container', 'display-table', 'parent-size');
             mainContainer.appendChild(field);
-        },
-        initFragments: function() {
+        };
+
+        this.initFragments = function() {
             var self = this;
             var currentMonth = self.month;
             var currentYear = self.year;
 
             for (var i = 0; i < self.config.fragmentsNumber; i++) {
-                fragmentsManager.setFragments({
+                self.fragmentsManager.setFragments({
                     year: currentYear,
                     monthIndex: currentMonth,
-                    fragmentHtml: fragmentsFactory.creteFragment(currentMonth, currentYear),
+                    fragmentHtml: self.fragmentsFactory.creteFragment(currentMonth, currentYear),
                     containerClassName: '.side-' + currentMonth
                 });
 
-                fragmentsFactory.creteFragmentContainer(currentMonth, currentYear);
+                self.fragmentsFactory.creteFragmentContainer(currentMonth, currentYear);
 
                 if (currentMonth < 11) {
                     currentMonth++;
@@ -481,30 +501,36 @@
                     currentMonth = 0;
                 }
             }
-        },
-        render: function() {
+        };
+
+        this.render = function() {
             var self = this;
 
-            self.month = calendar.config.month;
-            self.year = calendar.config.year;
+            self.month = self.config.month;
+            self.year = self.config.year;
+
+            self.createCalendarContainer();
 
             self.initFragments();
-            fragmentsManager.renderAllFragments();
+            self.fragmentsManager.renderAllFragments();
 
             self.initListeners();
-        },
-        initListeners: function() {
+        };
+
+        this.initListeners =  function() {
             var self = this;
 
             self.initCellHoverEffect();
-        },
-        initCellHoverEffect: function() {
+        };
+
+        this.initCellHoverEffect = function() {
             var self = this;
-            var sidesContainer = document.querySelector('.sides-container');
+            var mainContainer = document.querySelector(self.config.element);
+            var sidesContainer = mainContainer.querySelector('.sides-container');
 
             sidesContainer.addEventListener('mouseover', function(e) {
-                var start = fragmentsManager.selectedDateRange.start;
-                var end = fragmentsManager.selectedDateRange.end;
+                var start = self.fragmentsManager.selectedDateRange.start;
+                var end = self.fragmentsManager.selectedDateRange.end;
 
                 if (start && !end) {
                     var target = e.target;
@@ -519,15 +545,18 @@
                 }
             });
 
-        },
-        hoverCells: function(timestamp) {
-            var sidesContainer = document.querySelector('.sides-container');
+        };
+
+        this.hoverCells = function(timestamp) {
+            var self = this;
+            var mainContainer = document.querySelector(self.config.element);
+            var sidesContainer = mainContainer.querySelector('.sides-container');
             var cells = sidesContainer.querySelectorAll('.day');
             var cellsArr = Array.prototype.slice.call(cells);
 
             cellsArr.forEach(function(cell) {
                 var cellTimestamp = parseInt(cell.getAttribute('data-timestamp'), 10);
-                var start = fragmentsManager.selectedDateRange.start;
+                var start = self.fragmentsManager.selectedDateRange.start;
 
                 if (cellTimestamp < timestamp && cellTimestamp > start) {
                     cell.classList.add('hovered');
@@ -544,18 +573,7 @@
 
     return {
         initialize: function(config) {
-            console.error('init calendar');
-            calendar.config = {};
-            calendar.month = null;
-            calendar.year = null;
-
-            fragmentsManager.fragments = {};
-            fragmentsManager.selectedDateRange.start = null;
-            fragmentsManager.selectedDateRange.end = null;
-
-            calendar.config = extendConfig(config);
-            calendar.createCalendarContainer();
-            calendar.render();
+            return new Calendar(config);
         }
-    }
+    };
 }));

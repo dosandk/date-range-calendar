@@ -12,24 +12,44 @@
     <div class="debug date-range-calendar">
         <div id="custom-selector"></div>
     </div>
+
     <div>
         ====================
     </div>
+
+    <div class="debug date-range-calendar">
+        <div class="date-range-picker"></div>
+    </div>
+
+    <div>
+        ====================
+    </div>
+
     <div class="debug date-range-calendar">
         <div class="date-range-picker"></div>
     </div>
 
     <script>
-        Calendar.initialize({
+        var riba = Calendar.initialize({
             element: '#custom-selector',
             year: 2017,
-            month: 4
+            month: 2
         });
 
-        Calendar.initialize({
+        var foo = Calendar.initialize({
             year: 2019,
             month: 4
         });
+
+        var bar = Calendar.initialize({
+            year: 2018,
+            month: 4
+        });
+
+        riba.render();
+        foo.render();
+        bar.render();
+
     </script>
 
     <script type='text/javascript' id="__bs_script__">//<![CDATA[
