@@ -171,9 +171,6 @@
 
                 self.renderFragment(nextFragmentIndex);
             }
-
-            console.log(self);
-
         },
         initListeners: function(elem) {
             var self = this;
@@ -193,49 +190,68 @@
                     var timestamp = parseInt(target.getAttribute('data-timestamp'), 10);
 
                     if (classListArr.indexOf('selected') >= 0) {
-                        var targetTimestamp = parseInt(target.getAttribute('data-timestamp'), 10);
+                        self.updateDateRange(timestamp);
 
                         target.classList.remove('selected');
-
-                        if (targetTimestamp === self.selectedDateRange.start) {
-                            self.selectedDateRange.start = self.selectedDateRange.end;
-                            self.selectedDateRange.end = null;
-                        }
-                        else if (targetTimestamp === self.selectedDateRange.end) {
-                            self.selectedDateRange.end = null;
-                        }
                     }
                     else {
-                        if (self.selectedDateRange.start && self.selectedDateRange.end) {
-                            self.selectedDateRange.start = null;
-                            self.selectedDateRange.end = null;
-
-                            var sidesContainer = document.querySelector('.sides-container');
-                            var selectedDays = sidesContainer.querySelectorAll('.selected');
-                            var hoveredDays = sidesContainer.querySelectorAll('.hovered');
-                            var hoveredDaysArr = Array.prototype.slice.call(hoveredDays);
-                            var selectedDaysArr = Array.prototype.slice.call(selectedDays);
-
-                            selectedDaysArr.forEach(function(cell) {
-                                cell.classList.remove('selected');
-                            });
-
-                            hoveredDaysArr.forEach(function(cell) {
-                                cell.classList.remove('hovered');
-                            });
-                        }
-
-                        if (!self.selectedDateRange.start) {
-                            self.selectedDateRange.start = timestamp;
-                        }
-                        else if (!self.selectedDateRange.end) {
-                            self.selectedDateRange.end = timestamp;
-                        }
+                        self.resetDateRange();
+                        self.setDateRange(timestamp);
 
                         target.classList.add('selected');
                     }
                 }
             });
+        },
+        setDateRange: function(timestamp) {
+            var self = this;
+
+            if (!self.selectedDateRange.start) {
+                self.selectedDateRange.start = timestamp;
+            }
+            else if (!self.selectedDateRange.end) {
+                if (timestamp < self.selectedDateRange.start) {
+                    self.selectedDateRange.end = self.selectedDateRange.start;
+                    self.selectedDateRange.start = timestamp;
+                }
+                else {
+                    self.selectedDateRange.end = timestamp;
+                }
+            }
+
+        },
+        resetDateRange: function() {
+            var self = this;
+
+            if (self.selectedDateRange.start && self.selectedDateRange.end) {
+                self.selectedDateRange.start = null;
+                self.selectedDateRange.end = null;
+
+                var sidesContainer = document.querySelector('.sides-container');
+                var selectedDays = sidesContainer.querySelectorAll('.selected');
+                var hoveredDays = sidesContainer.querySelectorAll('.hovered');
+                var hoveredDaysArr = Array.prototype.slice.call(hoveredDays);
+                var selectedDaysArr = Array.prototype.slice.call(selectedDays);
+
+                selectedDaysArr.forEach(function(cell) {
+                    cell.classList.remove('selected');
+                });
+
+                hoveredDaysArr.forEach(function(cell) {
+                    cell.classList.remove('hovered');
+                });
+            }
+        },
+        updateDateRange: function(timestamp) {
+            var self = this;
+
+            if (timestamp === self.selectedDateRange.start) {
+                self.selectedDateRange.start = self.selectedDateRange.end;
+                self.selectedDateRange.end = null;
+            }
+            else if (timestamp === self.selectedDateRange.end) {
+                self.selectedDateRange.end = null;
+            }
         }
     };
 
@@ -348,19 +364,10 @@
                                 var start = fragmentsManager.selectedDateRange.start;
                                 var end = fragmentsManager.selectedDateRange.end;
 
-                                if (daysCounter === 2) {
-                                    console.log('start', start);
-                                    console.log('end', end);
-                                    console.log('dayTimestamp', dayTimestamp);
-                                }
-
                                 if (dayTimestamp === start || dayTimestamp === end) {
                                     cell.classList.add('selected');
                                 }
                                 else if (dayTimestamp > start && dayTimestamp < end) {
-                                    cell.classList.add('hovered');
-                                }
-                                else if (dayTimestamp < start && dayTimestamp > end) {
                                     cell.classList.add('hovered');
                                 }
 
