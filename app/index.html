@@ -11,63 +11,53 @@
     <script src="js/date-range-calendar.js"></script>
 </head>
 <body>
-    <div class="debug date-range-calendar">
-        <div id="custom-selector"></div>
+    <input class="text-input foo" type="text" placeholder="foo" />
+    <br>
+    <input class="text-input bar" type="text" placeholder="bar" />
+    <br>
+    <input class="text-input riba" type="text" placeholder="riba" />
+    <br>
+    <input class="text-input date-range-picker" type="text" placeholder="date-range-picker" />
+
+    <br>
+    <br>
+    <br>
+    <div class="date-range-container">
+        &nbsp;
     </div>
 
-    <div>
-        ====================
-    </div>
+    <!--<br><br><br>-->
+    <!--<input class="selector" type="text"/>-->
+    <!--<input class="selector" type="text"/>-->
+    <!--<input class="selector" type="text"/>-->
+    <!--<input class="selector" type="text"/>-->
 
-    <div class="debug date-range-calendar">
-        <div class="date-range-picker"></div>
-    </div>
-
-    <div>
-        ====================
-    </div>
-
-    <div class="debug date-range-calendar">
-        <div class="date-range-picker"></div>
-    </div>
-
-    <div>
-        ====================
-    </div>
-
-    <div class="debug date-range-calendar">
-        <div class="riba"></div>
-    </div>
-
-    <input class="selector" type="text"/>
-    <input class="selector" type="text"/>
-    <input class="selector" type="text"/>
-    <input class="selector" type="text"/>
-
-    <script>
-        $( ".selector" ).datepicker();
-    </script>
+    <!--<script>-->
+        <!--$( ".selector" ).datepicker();-->
+    <!--</script>-->
 
     <script>
         Calendar.initialize({
-            elementSelector: '#custom-selector',
-            year: 2017,
-            month: 2
+            elementSelector: '.foo',
+            year: 2019,
+            month: 3
         });
 
         Calendar.initialize({
+            elementSelector: '.bar',
             year: 2019,
-            month: 4,
+            month: 3,
             fragmentsNumber: 3
         });
 
         Calendar.initialize({
             elementSelector: '.riba',
-            year: 2018,
-            month: 4,
-            fragmentsNumber: 2
+            year: 2022,
+            month: 2,
+            fragmentsNumber: 1
         });
 
+        Calendar.initialize({});
     </script>
 
     <script type='text/javascript' id="__bs_script__">//<![CDATA[

@@ -52,8 +52,10 @@
     };
 
     var defaultConfig = {
+        input: null,
         element: null,
         elementSelector: '.date-range-picker',
+        calendarContainer: '.date-range-container',
         year: new Date().getFullYear(),
         month: new Date().getMonth(),
         fragmentsNumber: 2,
@@ -234,6 +236,7 @@
                 else {
                     self.resetDateRange();
                     self.setDateRange(timestamp);
+                    self.showDateRange();
 
                     target.classList.add('selected');
                 }
@@ -258,10 +261,33 @@
         }
     };
 
+    FM.fn.showDateRange = function() {
+        var self = this;
+        var start = self.selectedDateRange.start;
+        var end = self.selectedDateRange.end;
+        var input = self.parent.config.input;
+
+        self.resetInput();
+
+        if (start) {
+            input.value = 'Start: ' + new Date(start);
+        }
+
+        if (end) {
+            input.value += ' End: ' + new Date(end);
+        }
+    };
+
+    FM.fn.resetInput = function() {
+        this.parent.config.input.value = '';
+    };
+
     FM.fn.resetDateRange = function() {
         var self = this;
 
         if (self.selectedDateRange.start && self.selectedDateRange.end) {
+            self.resetInput();
+
             self.selectedDateRange.start = null;
             self.selectedDateRange.end = null;
 
@@ -518,12 +544,17 @@
         self.month = self.config.month;
         self.year = self.config.year;
 
+        self.resetCalendarContainer();
         self.createCalendarContainer();
-
         self.initFragments();
+
         self.fragmentsManager.renderAllFragments();
 
         self.initListeners();
+    };
+
+    Calendar.fn.resetCalendarContainer = function() {
+        this.config.element.innerHTML = '';
     };
 
     Calendar.fn.initListeners = function() {
@@ -584,16 +615,14 @@
             var elements = document.querySelectorAll(elementSelector);
             var elementsArr = Array.prototype.slice.call(elements);
 
+            config.element = document.querySelector(defaultConfig.calendarContainer);
+
             elementsArr.forEach(function(element) {
-                var classListArr = Array.prototype.slice.call(element.classList);
+                config.input = element;
 
-                if (classListArr.indexOf('has-date-date-picker') === -1) {
-                    config.element = element;
-
-                    var calendar = new Calendar(config);
-
-                    calendar.render();
-                }
+                element.addEventListener('click', function() {
+                    new Calendar(config).render();
+                });
             });
         }
     };
