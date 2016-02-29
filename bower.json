@@ -7,7 +7,7 @@
   "main": "",
   "moduleType": [],
   "license": "MIT",
-  "homepage": "",
+  "homepage": "https://github.com/dosandk/date-range-calendar",
   "ignore": [
     "**/.*",
     "node_modules",

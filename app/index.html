@@ -5,7 +5,9 @@
     <title>Date-range calendar</title>
     <link rel="stylesheet" type="text/css" href="css/default.css"/>
     <link rel="stylesheet" href="css/scaffolding.css">
-    <!--<script src="https://code.jquery.com/jquery-2.2.1.js"></script>-->
+
+    <!--<script src="../bower_components/jquery/dist/jquery.js"></script>-->
+    <!--<script src="../bower_components/jquery-ui/jquery-ui.js"></script>-->
     <script src="js/date-range-calendar.js"></script>
 </head>
 <body>
@@ -29,26 +31,42 @@
         <div class="date-range-picker"></div>
     </div>
 
+    <div>
+        ====================
+    </div>
+
+    <div class="debug date-range-calendar">
+        <div class="riba"></div>
+    </div>
+
+    <input class="selector" type="text"/>
+    <input class="selector" type="text"/>
+    <input class="selector" type="text"/>
+    <input class="selector" type="text"/>
+
     <script>
-        var riba = Calendar.initialize({
-            element: '#custom-selector',
+        $( ".selector" ).datepicker();
+    </script>
+
+    <script>
+        Calendar.initialize({
+            elementSelector: '#custom-selector',
             year: 2017,
             month: 2
         });
 
-        var foo = Calendar.initialize({
+        Calendar.initialize({
             year: 2019,
-            month: 4
+            month: 4,
+            fragmentsNumber: 3
         });
 
-        var bar = Calendar.initialize({
+        Calendar.initialize({
+            elementSelector: '.riba',
             year: 2018,
-            month: 4
+            month: 4,
+            fragmentsNumber: 2
         });
-
-        riba.render();
-        foo.render();
-        bar.render();
 
     </script>
 

@@ -52,7 +52,8 @@
     };
 
     var defaultConfig = {
-        element: '.date-range-picker',
+        element: null,
+        elementSelector: '.date-range-picker',
         year: new Date().getFullYear(),
         month: new Date().getMonth(),
         fragmentsNumber: 2,
@@ -135,7 +136,7 @@
 
     FM.fn.renderAllFragments = function() {
         var self = this;
-        var mainContainer = document.querySelector(self.parent.config.element);
+        var mainContainer = self.parent.config.element;
 
         for (var i in self.fragments) {
             var fragment = self.fragments[i].fragmentHtml;
@@ -152,7 +153,7 @@
 
         if (typeof fragmentIndex !== 'undefined') {
             var calendarObj = self.fragments[fragmentIndex];
-            var mainContainer = document.querySelector(self.parent.config.element);
+            var mainContainer = self.parent.config.element;
             var container = mainContainer.querySelector(calendarObj.containerClassName);
 
             container.innerHTML = '';
@@ -264,7 +265,7 @@
             self.selectedDateRange.start = null;
             self.selectedDateRange.end = null;
 
-            var mainContainer = document.querySelector(self.parent.config.element);
+            var mainContainer = self.parent.config.element;
             var sidesContainer = mainContainer.querySelector('.sides-container');
             var selectedDays = sidesContainer.querySelectorAll('.selected');
             var hoveredDays = sidesContainer.querySelectorAll('.hovered');
@@ -458,7 +459,7 @@
 
     FF.fn.creteFragmentContainer = function(month, year) {
         var self = this;
-        var mainContainer = document.querySelector(self.parent.config.element);
+        var mainContainer = self.parent.config.element;
         var sidesContainer = mainContainer.querySelector('.sides-container');
         var container = dom.createElement();
         var sideName = self.parent.fragmentsManager.fragments[year + '-' + month].containerClassName;
@@ -478,9 +479,10 @@
 
     Calendar.fn.createCalendarContainer = function() {
         var self = this;
-        var mainContainer = document.querySelector(self.config.element);
+        var mainContainer = self.config.element;
         var field = dom.createElement();
 
+        mainContainer.classList.add('has-date-date-picker');
         field.classList.add('sides-container', 'display-table', 'parent-size');
         mainContainer.appendChild(field);
     };
@@ -532,7 +534,7 @@
 
     Calendar.fn.initCellHoverEffect = function() {
         var self = this;
-        var mainContainer = document.querySelector(self.config.element);
+        var mainContainer = self.config.element;
         var sidesContainer = mainContainer.querySelector('.sides-container');
 
         sidesContainer.addEventListener('mouseover', function(e) {
@@ -555,7 +557,7 @@
 
     Calendar.fn.hoverCells = function(timestamp) {
         var self = this;
-        var mainContainer = document.querySelector(self.config.element);
+        var mainContainer = self.config.element;
         var sidesContainer = mainContainer.querySelector('.sides-container');
         var cells = sidesContainer.querySelectorAll('.day');
         var cellsArr = Array.prototype.slice.call(cells);
@@ -578,7 +580,21 @@
 
     return {
         initialize: function(config) {
-            return new Calendar(config);
+            var elementSelector = config.elementSelector || defaultConfig.elementSelector;
+            var elements = document.querySelectorAll(elementSelector);
+            var elementsArr = Array.prototype.slice.call(elements);
+
+            elementsArr.forEach(function(element) {
+                var classListArr = Array.prototype.slice.call(element.classList);
+
+                if (classListArr.indexOf('has-date-date-picker') === -1) {
+                    config.element = element;
+
+                    var calendar = new Calendar(config);
+
+                    calendar.render();
+                }
+            });
         }
     };
 }));
