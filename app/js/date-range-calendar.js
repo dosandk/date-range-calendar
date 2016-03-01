@@ -515,10 +515,15 @@
         var elements = document.querySelectorAll(elementSelector);
         var elementsArr = Array.prototype.slice.call(elements);
 
-        self.config.element = document.querySelector(defaultConfig.calendarContainer);
+        var mainContainer = document.querySelector(defaultConfig.calendarContainer);
+
+        mainContainer.classList.add('hide');
+
+        self.config.element = mainContainer;
 
         elementsArr.forEach(function(element) {
             self.config.input = element;
+            self.config.input.classList.add('has-date-range-picker');
 
             self.eventHandler = function() {
                 self.render();
@@ -553,7 +558,7 @@
         var field = dom.createElement();
 
         //TODO: move this class to input element
-        mainContainer.classList.add('has-date-date-picker');
+        mainContainer.classList.add('has-date-range-picker');
 
         field.classList.add('sides-container', 'display-table', 'parent-size');
         mainContainer.appendChild(field);
@@ -639,6 +644,29 @@
             }
         });
     };
+
+    document.addEventListener('click', function(e) {
+        var element = e.target;
+
+        if (element) {
+            var isMainContainerShown = false;
+            var mainContainer = document.querySelector('.date-range-container');
+
+            for (element; element != document.body && element.parentNode; element = element.parentNode) {
+                if (element.classList.contains('has-date-range-picker')) {
+                    isMainContainerShown = true;
+                    break;
+                }
+            }
+
+            if (!isMainContainerShown) {
+                mainContainer.classList.add('hide');
+            }
+            else {
+                mainContainer.classList.remove('hide');
+            }
+        }
+    });
 
     Calendar.fn.destroy = function() {
         var self = this;
