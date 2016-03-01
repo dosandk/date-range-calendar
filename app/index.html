@@ -37,27 +37,33 @@
     <!--</script>-->
 
     <script>
-        Calendar.initialize({
+        var foo = new Calendar({
             elementSelector: '.foo',
             year: 2019,
             month: 3
         });
 
-        Calendar.initialize({
+        var bar = new Calendar({
             elementSelector: '.bar',
             year: 2019,
             month: 3,
             fragmentsNumber: 3
         });
 
-        Calendar.initialize({
+        var riba = new Calendar({
             elementSelector: '.riba',
             year: 2022,
             month: 2,
             fragmentsNumber: 1
         });
 
-        Calendar.initialize({});
+        var defaultCalendar = new Calendar();
+
+//        foo.destroy();
+//        bar.destroy();
+//        riba.destroy();
+        defaultCalendar.destroy();
+
     </script>
 
     <script type='text/javascript' id="__bs_script__">//<![CDATA[

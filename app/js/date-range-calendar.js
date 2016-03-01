@@ -505,19 +505,56 @@
     };
 
     var Calendar = function(config) {
-        this.config = extendConfig(config);
-        this.fragmentsManager = new FragmentsManager({ parent: this });
-        this.fragmentsFactory = new FragmentsFactory({ parent: this });
+        var self = this;
+
+        self.config = extendConfig(config);
+        self.fragmentsManager = new FragmentsManager({ parent: self });
+        self.fragmentsFactory = new FragmentsFactory({ parent: self });
+
+        var elementSelector = self.config.elementSelector || defaultConfig.elementSelector;
+        var elements = document.querySelectorAll(elementSelector);
+        var elementsArr = Array.prototype.slice.call(elements);
+
+        self.config.element = document.querySelector(defaultConfig.calendarContainer);
+
+        elementsArr.forEach(function(element) {
+            self.config.input = element;
+
+            self.eventHandler = function() {
+                self.render();
+            };
+
+            element.addEventListener('click', self.eventHandler);
+        });
+
+        return this;
     };
 
     Calendar.fn = Calendar.prototype;
+
+    Calendar.fn.render = function() {
+        var self = this;
+
+        self.month = self.config.month;
+        self.year = self.config.year;
+
+        self.resetCalendarContainer();
+        self.createCalendarContainer();
+        self.initFragments();
+
+        self.fragmentsManager.renderAllFragments();
+
+        self.initListeners();
+    };
 
     Calendar.fn.createCalendarContainer = function() {
         var self = this;
         var mainContainer = self.config.element;
         var field = dom.createElement();
 
+        //TODO: move this class to input element
         mainContainer.classList.add('has-date-date-picker');
+
         field.classList.add('sides-container', 'display-table', 'parent-size');
         mainContainer.appendChild(field);
     };
@@ -545,21 +582,6 @@
                 currentMonth = 0;
             }
         }
-    };
-
-    Calendar.fn.render = function() {
-        var self = this;
-
-        self.month = self.config.month;
-        self.year = self.config.year;
-
-        self.resetCalendarContainer();
-        self.createCalendarContainer();
-        self.initFragments();
-
-        self.fragmentsManager.renderAllFragments();
-
-        self.initListeners();
     };
 
     Calendar.fn.resetCalendarContainer = function() {
@@ -618,21 +640,11 @@
         });
     };
 
-    return {
-        initialize: function(config) {
-            var elementSelector = config.elementSelector || defaultConfig.elementSelector;
-            var elements = document.querySelectorAll(elementSelector);
-            var elementsArr = Array.prototype.slice.call(elements);
+    Calendar.fn.destroy = function() {
+        var self = this;
 
-            config.element = document.querySelector(defaultConfig.calendarContainer);
-
-            elementsArr.forEach(function(element) {
-                config.input = element;
-
-                element.addEventListener('click', function() {
-                    new Calendar(config).render();
-                });
-            });
-        }
+        self.config.input.removeEventListener('click', self.eventHandler);
     };
+
+    return Calendar;
 }));
