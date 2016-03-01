@@ -40,6 +40,15 @@
         }
     };
 
+    function formatDate(timestamp) {
+        var year = new Date(timestamp).getFullYear();
+        var month = new Date(timestamp).getMonth();
+        var monthName = defaultConfig.monthNames[month];
+        var day = new Date(timestamp).getDate();
+
+        return day + ' ' + monthName + ' ' + year;
+    }
+
     var dom = {
         createElement: function(elemName) {
             var elementName = elemName || 'div';
@@ -270,11 +279,11 @@
         self.resetInput();
 
         if (start) {
-            input.value = 'Start: ' + new Date(start);
+            input.value = 'Start: ' + formatDate(start);
         }
 
         if (end) {
-            input.value += ' End: ' + new Date(end);
+            input.value += ' End: ' + formatDate(end);
         }
     };
 
