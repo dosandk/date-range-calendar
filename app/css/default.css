@@ -1,13 +1,20 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
 .date-range-container {
-    outline: 1px solid red;
     width: 600px;
     position: absolute;
     z-index: 1;
     opacity: 0;
+    top: 0;
+    left: 0;
+    background: lightblue;
 }
 
 .text-input {
-    width: 800px;
+    width: 200px;
 }
 
 .day {

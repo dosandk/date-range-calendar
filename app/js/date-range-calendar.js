@@ -515,18 +515,17 @@
         var elements = document.querySelectorAll(elementSelector);
         var elementsArr = Array.prototype.slice.call(elements);
 
-        var mainContainer = document.querySelector(defaultConfig.calendarContainer);
-
-        //mainContainer.classList.add('hide');
-
-        self.config.element = mainContainer;
+        self.createMainContainer();
 
         elementsArr.forEach(function(element) {
             self.config.input = element;
             self.config.input.classList.add('has-date-range-picker');
 
-            self.eventHandler = function() {
-                self.render();
+            self.eventHandler = function(e) {
+                if (self.config.input.classList.contains('has-date-range-picker')) {
+                    self.calculatePosition(e);
+                    self.render();
+                }
             };
 
             element.addEventListener('click', self.eventHandler);
@@ -536,6 +535,28 @@
     };
 
     Calendar.fn = Calendar.prototype;
+
+    Calendar.fn.calculatePosition = function(e) {
+        var self = this;
+        var target = e.target;
+
+        self.config.element.style.top = target.offsetTop + target.offsetHeight  + 'px';
+        self.config.element.style.left = target.offsetLeft + 'px';
+    };
+
+    Calendar.fn.createMainContainer = function() {
+        var self = this;
+        var mainContainer = document.querySelector(defaultConfig.calendarContainer);
+
+        if (!mainContainer) {
+            mainContainer = document.createElement('div');
+            mainContainer.classList.add(defaultConfig.calendarContainer.slice(1), 'hide');
+
+            document.body.appendChild(mainContainer);
+        }
+
+        self.config.element = mainContainer;
+    };
 
     Calendar.fn.render = function() {
         var self = this;
@@ -662,6 +683,9 @@
             if (+el.style.opacity < 1) {
                 (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, FPS);
             }
+            else {
+                el.classList.remove('hide')
+            }
         };
 
         tick();
@@ -681,6 +705,9 @@
 
             if (+el.style.opacity > 0) {
                 (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, FPS);
+            }
+            else {
+                el.classList.add('hide')
             }
         };
 
@@ -712,8 +739,10 @@
 
     Calendar.fn.destroy = function() {
         var self = this;
+        var input = self.config.input;
 
-        self.config.input.removeEventListener('click', self.eventHandler);
+        input.removeEventListener('click', self.eventHandler);
+        input.classList. remove('has-date-range-picker');
     };
 
     return Calendar;
