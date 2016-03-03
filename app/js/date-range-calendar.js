@@ -354,7 +354,7 @@
                 var leftArrow = dom.createElement('span');
                 var leftArrowIcon = document.createTextNode('<<');
 
-                dom.addClass(leftArrow, 'js-arrow-left-' + currentMonth);
+                leftArrow.classList.add('js-arrow-left-' + currentMonth, 'js-nav-elem');
 
                 leftArrow.setAttribute('data-month', currentMonth);
                 leftArrow.setAttribute('data-state', 'prev');
@@ -364,7 +364,7 @@
                 var rightArrow = dom.createElement('span');
                 var rightArrowIcon = document.createTextNode('>>');
 
-                dom.addClass(rightArrow, 'js-arrow-right-' + currentMonth);
+                rightArrow.classList.add('js-arrow-right-' + currentMonth, 'js-nav-elem');
 
                 rightArrow.setAttribute('data-month', currentMonth);
                 rightArrow.setAttribute('data-state', 'next');
@@ -552,6 +552,10 @@
         self.initListeners();
     };
 
+    Calendar.fn.resetCalendarContainer = function() {
+        this.config.element.innerHTML = '';
+    };
+
     Calendar.fn.createCalendarContainer = function() {
         var self = this;
         var mainContainer = self.config.element;
@@ -568,6 +572,8 @@
         var self = this;
         var currentMonth = self.month;
         var currentYear = self.year;
+
+        self.fragmentsManager.fragments = {};
 
         for (var i = 0; i < self.config.fragmentsNumber; i++) {
             self.fragmentsManager.setFragments({
@@ -587,10 +593,6 @@
                 currentMonth = 0;
             }
         }
-    };
-
-    Calendar.fn.resetCalendarContainer = function() {
-        this.config.element.innerHTML = '';
     };
 
     Calendar.fn.initListeners = function() {
@@ -653,7 +655,7 @@
             var mainContainer = document.querySelector('.date-range-container');
 
             for (element; element != document.body && element.parentNode; element = element.parentNode) {
-                if (element.classList.contains('has-date-range-picker')) {
+                if (element.classList.contains('has-date-range-picker') || element.classList.contains('js-nav-elem')) {
                     isMainContainerShown = true;
                     break;
                 }
