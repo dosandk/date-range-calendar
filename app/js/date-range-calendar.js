@@ -517,7 +517,7 @@
 
         var mainContainer = document.querySelector(defaultConfig.calendarContainer);
 
-        mainContainer.classList.add('hide');
+        //mainContainer.classList.add('hide');
 
         self.config.element = mainContainer;
 
@@ -647,6 +647,46 @@
         });
     };
 
+    function fadeIn(el, speed) {
+        var elementOpacity = el.style.opacity ? parseInt(el.style.opacity, 10) : 0;
+        var last = +new Date();
+        var animationSpeed = typeof speed !== 'undefined' ? speed : 400;
+        var FPS = 16;
+
+        var tick = function() {
+            elementOpacity += (new Date() - last) / animationSpeed;
+            last = +new Date();
+
+            el.style.opacity = elementOpacity;
+
+            if (+el.style.opacity < 1) {
+                (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, FPS);
+            }
+        };
+
+        tick();
+    }
+
+    function fadeOut(el, speed) {
+        var elementOpacity = el.style.opacity ? parseInt(el.style.opacity, 10) : 0;
+        var last = +new Date();
+        var animationSpeed = typeof speed !== 'undefined' ? speed : 400;
+        var FPS = 16;
+
+        var tick = function() {
+            elementOpacity -= (new Date() - last) / animationSpeed;
+            last = +new Date();
+
+            el.style.opacity = elementOpacity;
+
+            if (+el.style.opacity > 0) {
+                (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, FPS);
+            }
+        };
+
+        tick();
+    }
+
     document.addEventListener('click', function(e) {
         var element = e.target;
 
@@ -662,10 +702,10 @@
             }
 
             if (!isMainContainerShown) {
-                mainContainer.classList.add('hide');
+                fadeOut(mainContainer);
             }
             else {
-                mainContainer.classList.remove('hide');
+                fadeIn(mainContainer);
             }
         }
     });
