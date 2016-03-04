@@ -4,13 +4,56 @@ body {
 }
 
 .date-range-container {
-    width: 600px;
     position: absolute;
     z-index: 1;
     opacity: 0;
     top: 0;
     left: 0;
-    background: lightblue;
+    background: #fefefe;
+    border: 1px solid #94a8bc;
+}
+
+.drp-sides-container {
+    /*outline: 1px solid red;*/
+}
+
+.drp-side {
+    width: 260px;
+    height: 280px;
+    vertical-align: top;
+}
+
+.drp-caption {
+    height: 60px;
+    background: #fe6666;
+    color: #fefefe;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.drp-table-wrapper {
+    margin: 0 15px;
+}
+
+.drp-table {
+    border: 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+    font: bold 14px/2.2 Helvetica, sans-serif;
+    color: #647386;
+}
+
+.drp-thead {
+    font-weight: bold;
+    color: #94a8bc;
+}
+
+.drp-row {
+    /*outline: 1px solid red;*/
+}
+
+.drp-td {
+    /*outline: 1px solid darkturquoise;*/
 }
 
 .text-input {
@@ -21,23 +64,23 @@ body {
     cursor: pointer;
 }
 .day:hover {
-    background: lightskyblue;
+    background: #87CEFA;
 }
 
 .day.selected {
-    background: dodgerblue;
+    background: #87CEFA;
 }
 
 .day.hovered {
-    background: pink;
+    background: #FFC0CB;
 }
 
 .day.selected.active {
-    background: #114e88;
+    background: #8cb9e9;
 }
 
 .active {
-    background: gainsboro;
+    border: 1px solid #fe6666;
 }
 
 .hide {

@@ -148,12 +148,12 @@
     FM.fn.renderAllFragments = function() {
         var self = this;
         var mainContainer = self.parent.config.element;
+        var sidesContainer = mainContainer.querySelector('.js-sides-container');
 
         for (var i in self.fragments) {
             var fragment = self.fragments[i].fragmentHtml;
-            var field = self.fragments[i].containerClassName;
 
-            mainContainer.querySelector(field).appendChild(fragment);
+            sidesContainer.appendChild(fragment);
 
             self.initListeners(fragment);
         }
@@ -301,7 +301,7 @@
             self.selectedDateRange.end = null;
 
             var mainContainer = self.parent.config.element;
-            var sidesContainer = mainContainer.querySelector('.sides-container');
+            var sidesContainer = mainContainer.querySelector('.js-sides-container');
             var selectedDays = sidesContainer.querySelectorAll('.selected');
             var hoveredDays = sidesContainer.querySelectorAll('.hovered');
             var hoveredDaysArr = Array.prototype.slice.call(hoveredDays);
@@ -343,52 +343,13 @@
         var daysPerWeek = self.parent.config.daysPerWeek;
         var daysNames = self.parent.config.daysNames;
 
-        dom.addClass(table, 'fixed-table-layout parent-width txt-align-center');
-
-        function createTableCaption() {
-            var monthName = self.parent.config.monthNames[currentMonth];
-            var tableCaption = dom.createElement('caption');
-            var text = document.createTextNode(monthName + ' ' + currentYear);
-
-            function createNavigation() {
-                var leftArrow = dom.createElement('span');
-                var leftArrowIcon = document.createTextNode('<<');
-
-                leftArrow.classList.add('js-arrow-left-' + currentMonth, 'js-nav-elem');
-
-                leftArrow.setAttribute('data-month', currentMonth);
-                leftArrow.setAttribute('data-state', 'prev');
-                leftArrow.setAttribute('data-year', currentYear);
-                leftArrow.appendChild(leftArrowIcon);
-
-                var rightArrow = dom.createElement('span');
-                var rightArrowIcon = document.createTextNode('>>');
-
-                rightArrow.classList.add('js-arrow-right-' + currentMonth, 'js-nav-elem');
-
-                rightArrow.setAttribute('data-month', currentMonth);
-                rightArrow.setAttribute('data-state', 'next');
-                rightArrow.setAttribute('data-year', currentYear);
-                rightArrow.appendChild(rightArrowIcon);
-
-                return {
-                    leftArrow: leftArrow,
-                    rightArrow: rightArrow
-                }
-            }
-
-            var arrows = createNavigation();
-
-            tableCaption.appendChild(arrows.leftArrow);
-            tableCaption.appendChild(text);
-            tableCaption.appendChild(arrows.rightArrow);
-
-            return tableCaption;
-        }
+        table.classList.add('drp-table', 'fixed-table-layout', 'parent-width', 'txt-align-center');
 
         function createTableHeader() {
             var tableHeader = dom.createElement('thead');
             var row = dom.createElement('tr');
+
+            tableHeader.classList.add('drp-thead');
 
             for (var i = 0; i < daysNames.length; i++) {
                 var cell = dom.createElement('td');
@@ -422,6 +383,8 @@
                     if (daysCounter <= daysInMonth) {
                         cell = dom.createElement('td');
                         text = document.createTextNode('');
+
+                        cell.classList.add('drp-td');
 
                         if (startCounter >= startIndex) {
                             var date = new Date();
@@ -473,6 +436,8 @@
                     row = dom.createElement('tr');
                     week = createCells();
 
+                    row.classList.add('drp-row');
+
                     row.appendChild(week);
                     rows.appendChild(row);
                 }
@@ -485,23 +450,72 @@
             return tableBody;
         }
 
-        table.appendChild(createTableCaption());
+        function createTableCaption() {
+            var monthName = self.parent.config.monthNames[currentMonth];
+
+            var tableCaption = document.createElement('div');
+            var text = document.createTextNode(monthName + ' ' + currentYear);
+
+            tableCaption.classList.add('drp-caption');
+
+            function createNavigation() {
+                var leftArrow = dom.createElement('span');
+                var leftArrowIcon = document.createTextNode('<<');
+
+                leftArrow.classList.add('js-arrow-left-' + currentMonth, 'js-nav-elem');
+
+                leftArrow.setAttribute('data-month', currentMonth);
+                leftArrow.setAttribute('data-state', 'prev');
+                leftArrow.setAttribute('data-year', currentYear);
+                leftArrow.appendChild(leftArrowIcon);
+
+                var rightArrow = dom.createElement('span');
+                var rightArrowIcon = document.createTextNode('>>');
+
+                rightArrow.classList.add('js-arrow-right-' + currentMonth, 'js-nav-elem');
+
+                rightArrow.setAttribute('data-month', currentMonth);
+                rightArrow.setAttribute('data-state', 'next');
+                rightArrow.setAttribute('data-year', currentYear);
+                rightArrow.appendChild(rightArrowIcon);
+
+                return {
+                    leftArrow: leftArrow,
+                    rightArrow: rightArrow
+                }
+            }
+
+            var arrows = createNavigation();
+
+            tableCaption.appendChild(arrows.leftArrow);
+            tableCaption.appendChild(text);
+            tableCaption.appendChild(arrows.rightArrow);
+
+            return tableCaption;
+        }
+
+        var fragmentContainer = self.creteFragmentContainer(currentMonth);
+        var tableWrapper = document.createElement('div');
+        tableWrapper.classList.add('drp-table-wrapper');
+
         table.appendChild(createTableHeader());
         table.appendChild(createTableBody());
 
-        return table;
+        tableWrapper.appendChild(table);
+
+        fragmentContainer.appendChild(createTableCaption());
+        fragmentContainer.appendChild(tableWrapper);
+
+        return fragmentContainer;
     };
 
-    FF.fn.creteFragmentContainer = function(month, year) {
-        var self = this;
-        var mainContainer = self.parent.config.element;
-        var sidesContainer = mainContainer.querySelector('.sides-container');
-        var container = dom.createElement();
-        var sideName = self.parent.fragmentsManager.fragments[year + '-' + month].containerClassName;
+    FF.fn.creteFragmentContainer = function(month) {
+        var container = document.createElement('div');
+        var sideName = '.js-side-' + month;
 
-        dom.addClass(container, sideName.slice(1) + ' display-table-cell');
+        container.classList.add(sideName.slice(1), 'drp-side', 'display-table-cell');
 
-        sidesContainer.appendChild(container);
+        return container;
     };
 
     var Calendar = function(config) {
@@ -582,10 +596,9 @@
         var mainContainer = self.config.element;
         var field = dom.createElement();
 
-        //TODO: move this class to input element
         mainContainer.classList.add('has-date-range-picker');
 
-        field.classList.add('sides-container', 'display-table', 'parent-size');
+        field.classList.add('js-sides-container', 'drp-sides-container', 'display-table', 'parent-size');
         mainContainer.appendChild(field);
     };
 
@@ -601,10 +614,8 @@
                 year: currentYear,
                 monthIndex: currentMonth,
                 fragmentHtml: self.fragmentsFactory.creteFragment(currentMonth, currentYear),
-                containerClassName: '.side-' + currentMonth
+                containerClassName: '.js-side-' + currentMonth
             });
-
-            self.fragmentsFactory.creteFragmentContainer(currentMonth, currentYear);
 
             if (currentMonth < 11) {
                 currentMonth++;
@@ -625,7 +636,7 @@
     Calendar.fn.initCellHoverEffect = function() {
         var self = this;
         var mainContainer = self.config.element;
-        var sidesContainer = mainContainer.querySelector('.sides-container');
+        var sidesContainer = mainContainer.querySelector('.js-sides-container');
 
         sidesContainer.addEventListener('mouseover', function(e) {
             var start = self.fragmentsManager.selectedDateRange.start;
@@ -648,7 +659,7 @@
     Calendar.fn.hoverCells = function(timestamp) {
         var self = this;
         var mainContainer = self.config.element;
-        var sidesContainer = mainContainer.querySelector('.sides-container');
+        var sidesContainer = mainContainer.querySelector('.js-sides-container');
         var cells = sidesContainer.querySelectorAll('.day');
         var cellsArr = Array.prototype.slice.call(cells);
 
