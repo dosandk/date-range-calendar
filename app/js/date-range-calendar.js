@@ -674,6 +674,8 @@
         var animationSpeed = typeof speed !== 'undefined' ? speed : 400;
         var FPS = 16;
 
+        el.classList.remove('hide');
+
         var tick = function() {
             elementOpacity += (new Date() - last) / animationSpeed;
             last = +new Date();
@@ -681,10 +683,8 @@
             el.style.opacity = elementOpacity;
 
             if (+el.style.opacity < 1) {
+
                 (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, FPS);
-            }
-            else {
-                el.classList.remove('hide')
             }
         };
 
