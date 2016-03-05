@@ -6,11 +6,37 @@ body {
 .date-range-container {
     position: absolute;
     z-index: 1;
-    opacity: 0;
+    /*opacity: 0;*/
     top: 0;
     left: 0;
     background: #fefefe;
     border: 1px solid #94a8bc;
+}
+/* file size: 0.3ko | already optimized | base64 size: 0.4ko */
+.optimised-left {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: url(data:image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMzIiIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDMyIDMyIiB3aWR0aD0iMzIiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxwb2x5Z29uIHBvaW50cz0iMTYwIDI1NiAxNjAgMjU2IDMxOS43IDQxNiAzNTIgMzgzLjYgMjI0LjcgMjU2IDM1MiAxMjguNCAzMTkuNyA5NiAxNjAgMjU2ICIgdHJhbnNmb3JtPSJtYXRyaXgoMC4wOTc3OTcwMSwwLDAsLTAuMDk3Nzk3MDEsLTguOTYyOTU2MSw0MC45NzgyNzMpIiBmaWxsPSIjZmZmIi8+PC9zdmc+) 50% 50%/50% 50% no-repeat;
+    /*background-repeat: no-repeat;*/
+    /*background-size: contain;*/
+    cursor: pointer;
+    margin: 0 0 0 10px;
+}
+.optimised-left:hover {
+    background-color: #c55b5b;
+}
+/* file size: 0.3ko | already optimized | base64 size: 0.4ko */
+.optimised-right {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: url(data:image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMzIiIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDMyIDMyIiB3aWR0aD0iMzIiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxwb2x5Z29uIHBvaW50cz0iMzE5LjcgNDE2IDM1MiAzODMuNiAyMjQuNyAyNTYgMzUyIDEyOC40IDMxOS43IDk2IDE2MCAyNTYgMTYwIDI1NiAxNjAgMjU2ICIgdHJhbnNmb3JtPSJtYXRyaXgoLTAuMDk3Nzk3MDEsMCwwLDAuMDk3Nzk3MDEsNDEuMTA5MTEzLC05LjA5Mzc5NjEpIiBmaWxsPSIjZmZmIi8+PC9zdmc+) 50% 50%/50% 50% no-repeat;
+    cursor: pointer;
+    margin: 0 10px 0 0;
+}
+.optimised-right:hover {
+    background-color: #c55b5b;
 }
 
 .drp-sides-container {
@@ -54,6 +80,7 @@ body {
 
 .drp-td {
     /*outline: 1px solid darkturquoise;*/
+    border-radius: 50%;
 }
 
 .text-input {

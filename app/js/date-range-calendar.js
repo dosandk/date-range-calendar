@@ -454,30 +454,33 @@
             var monthName = self.parent.config.monthNames[currentMonth];
 
             var tableCaption = document.createElement('div');
-            var text = document.createTextNode(monthName + ' ' + currentYear);
+            var tableCaptionInner = document.createElement('div');
 
             tableCaption.classList.add('drp-caption');
+            tableCaptionInner.classList.add('display-table', 'parent-size');
+
+            var text = document.createTextNode(monthName + ' ' + currentYear);
 
             function createNavigation() {
                 var leftArrow = dom.createElement('span');
-                var leftArrowIcon = document.createTextNode('<<');
+                //var leftArrowIcon = document.createTextNode('<<');
 
-                leftArrow.classList.add('js-arrow-left-' + currentMonth, 'js-nav-elem');
+                leftArrow.classList.add('js-arrow-left-' + currentMonth, 'js-nav-elem', 'optimised-left', 'display-inline-block');
 
                 leftArrow.setAttribute('data-month', currentMonth);
                 leftArrow.setAttribute('data-state', 'prev');
                 leftArrow.setAttribute('data-year', currentYear);
-                leftArrow.appendChild(leftArrowIcon);
+                //leftArrow.appendChild(leftArrowIcon);
 
                 var rightArrow = dom.createElement('span');
-                var rightArrowIcon = document.createTextNode('>>');
+                //var rightArrowIcon = document.createTextNode('>>');
 
-                rightArrow.classList.add('js-arrow-right-' + currentMonth, 'js-nav-elem');
+                rightArrow.classList.add('js-arrow-right-' + currentMonth, 'js-nav-elem', 'optimised-right', 'display-inline-block');
 
                 rightArrow.setAttribute('data-month', currentMonth);
                 rightArrow.setAttribute('data-state', 'next');
                 rightArrow.setAttribute('data-year', currentYear);
-                rightArrow.appendChild(rightArrowIcon);
+                //rightArrow.appendChild(rightArrowIcon);
 
                 return {
                     leftArrow: leftArrow,
@@ -564,7 +567,9 @@
 
         if (!mainContainer) {
             mainContainer = document.createElement('div');
-            mainContainer.classList.add(defaultConfig.calendarContainer.slice(1), 'hide');
+            // TODO: uncomment this before push
+            //mainContainer.classList.add(defaultConfig.calendarContainer.slice(1), 'hide');
+            mainContainer.classList.add(defaultConfig.calendarContainer.slice(1));
 
             document.body.appendChild(mainContainer);
         }
@@ -725,28 +730,28 @@
         tick();
     }
 
-    document.addEventListener('click', function(e) {
-        var element = e.target;
-
-        if (element) {
-            var isMainContainerShown = false;
-            var mainContainer = document.querySelector('.date-range-container');
-
-            for (element; element != document.body && element.parentNode; element = element.parentNode) {
-                if (element.classList.contains('has-date-range-picker') || element.classList.contains('js-nav-elem')) {
-                    isMainContainerShown = true;
-                    break;
-                }
-            }
-
-            if (!isMainContainerShown) {
-                fadeOut(mainContainer);
-            }
-            else {
-                fadeIn(mainContainer);
-            }
-        }
-    });
+    //document.addEventListener('click', function(e) {
+    //    var element = e.target;
+    //
+    //    if (element) {
+    //        var isMainContainerShown = false;
+    //        var mainContainer = document.querySelector('.date-range-container');
+    //
+    //        for (element; element != document.body && element.parentNode; element = element.parentNode) {
+    //            if (element.classList.contains('has-date-range-picker') || element.classList.contains('js-nav-elem')) {
+    //                isMainContainerShown = true;
+    //                break;
+    //            }
+    //        }
+    //
+    //        if (!isMainContainerShown) {
+    //            fadeOut(mainContainer);
+    //        }
+    //        else {
+    //            fadeIn(mainContainer);
+    //        }
+    //    }
+    //});
 
     Calendar.fn.destroy = function() {
         var self = this;
