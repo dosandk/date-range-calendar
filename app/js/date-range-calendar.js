@@ -106,7 +106,7 @@
 
     FM.fn.initMonthSwitchingEvent = function(elem) {
         var self = this;
-        var arrows = elem.querySelectorAll('span[class^="js-arrow-"]');
+        var arrows = elem.querySelectorAll('.js-nav-elem');
         var arrowIndex = arrows.length;
 
         while (arrowIndex--) {
@@ -459,40 +459,48 @@
             tableCaption.classList.add('drp-caption');
             tableCaptionInner.classList.add('display-table', 'parent-size');
 
-            var text = document.createTextNode(monthName + ' ' + currentYear);
+            var middleCell = document.createElement('div');
+            var middleCellTxt = document.createTextNode(monthName + ' ' + currentYear);
 
-            function createNavigation() {
-                var leftArrow = dom.createElement('span');
-                //var leftArrowIcon = document.createTextNode('<<');
+            middleCell.classList.add('bold', 'display-table-cell', 'vertical-align-middle');
+            middleCell.appendChild(middleCellTxt);
 
-                leftArrow.classList.add('js-arrow-left-' + currentMonth, 'js-nav-elem', 'optimised-left', 'display-inline-block');
+            function createArrows(type) {
+                var cellContainer = document.createElement('div');
+                var arrowsContainer = document.createElement('div');
+                var arrow = document.createElement('div');
+                var circle = document.createElement('div');
 
-                leftArrow.setAttribute('data-month', currentMonth);
-                leftArrow.setAttribute('data-state', 'prev');
-                leftArrow.setAttribute('data-year', currentYear);
-                //leftArrow.appendChild(leftArrowIcon);
+                var iconClass = type === 'left' ? 'drp-svg-arrow-left' : 'drp-svg-arrow-right';
+                var state = type === 'left' ? 'prev' : 'next';
+                var align = type === 'left' ? 'align-left' : 'align-right';
 
-                var rightArrow = dom.createElement('span');
-                //var rightArrowIcon = document.createTextNode('>>');
+                cellContainer.classList.add(align, 'display-table-cell', 'vertical-align-middle');
+                arrowsContainer.classList.add('js-nav-elem', 'drp-arrows-container', 'display-inline-block', 'relative');
 
-                rightArrow.classList.add('js-arrow-right-' + currentMonth, 'js-nav-elem', 'optimised-right', 'display-inline-block');
+                arrow.classList.add(iconClass, 'parent-size', 'absolute');
+                circle.classList.add('drp-svg-circle', 'parent-size', 'absolute');
 
-                rightArrow.setAttribute('data-month', currentMonth);
-                rightArrow.setAttribute('data-state', 'next');
-                rightArrow.setAttribute('data-year', currentYear);
-                //rightArrow.appendChild(rightArrowIcon);
+                arrowsContainer.setAttribute('data-month', currentMonth);
+                arrowsContainer.setAttribute('data-state', state);
+                arrowsContainer.setAttribute('data-year', currentYear);
 
-                return {
-                    leftArrow: leftArrow,
-                    rightArrow: rightArrow
-                }
+                arrowsContainer.appendChild(arrow);
+                arrowsContainer.appendChild(circle);
+
+                cellContainer.appendChild(arrowsContainer);
+
+                return cellContainer;
             }
 
-            var arrows = createNavigation();
+            var leftCell = createArrows('left');
+            var rightCell = createArrows('right');
 
-            tableCaption.appendChild(arrows.leftArrow);
-            tableCaption.appendChild(text);
-            tableCaption.appendChild(arrows.rightArrow);
+            tableCaptionInner.appendChild(leftCell);
+            tableCaptionInner.appendChild(middleCell);
+            tableCaptionInner.appendChild(rightCell);
+
+            tableCaption.appendChild(tableCaptionInner);
 
             return tableCaption;
         }
@@ -567,9 +575,7 @@
 
         if (!mainContainer) {
             mainContainer = document.createElement('div');
-            // TODO: uncomment this before push
-            //mainContainer.classList.add(defaultConfig.calendarContainer.slice(1), 'hide');
-            mainContainer.classList.add(defaultConfig.calendarContainer.slice(1));
+            mainContainer.classList.add(defaultConfig.calendarContainer.slice(1), 'hide');
 
             document.body.appendChild(mainContainer);
         }
@@ -730,28 +736,28 @@
         tick();
     }
 
-    //document.addEventListener('click', function(e) {
-    //    var element = e.target;
-    //
-    //    if (element) {
-    //        var isMainContainerShown = false;
-    //        var mainContainer = document.querySelector('.date-range-container');
-    //
-    //        for (element; element != document.body && element.parentNode; element = element.parentNode) {
-    //            if (element.classList.contains('has-date-range-picker') || element.classList.contains('js-nav-elem')) {
-    //                isMainContainerShown = true;
-    //                break;
-    //            }
-    //        }
-    //
-    //        if (!isMainContainerShown) {
-    //            fadeOut(mainContainer);
-    //        }
-    //        else {
-    //            fadeIn(mainContainer);
-    //        }
-    //    }
-    //});
+    document.addEventListener('click', function(e) {
+        var element = e.target;
+
+        if (element) {
+            var isMainContainerShown = false;
+            var mainContainer = document.querySelector('.date-range-container');
+
+            for (element; element != document.body && element.parentNode; element = element.parentNode) {
+                if (element.classList.contains('has-date-range-picker') || element.classList.contains('js-nav-elem')) {
+                    isMainContainerShown = true;
+                    break;
+                }
+            }
+
+            if (!isMainContainerShown) {
+                fadeOut(mainContainer);
+            }
+            else {
+                fadeIn(mainContainer);
+            }
+        }
+    });
 
     Calendar.fn.destroy = function() {
         var self = this;

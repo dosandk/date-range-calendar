@@ -31,6 +31,10 @@
     table-layout: fixed;
 }
 
+.bold {
+    font-weight: bold;
+}
+
 .parent-size {
     width: 100%;
     height: 100%;
@@ -46,6 +50,10 @@
 
 .parent-half-width {
     width: 50%;
+}
+
+.absolute {
+    position: absolute;
 }
 
 .relative {
