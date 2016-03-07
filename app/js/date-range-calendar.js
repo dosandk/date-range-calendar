@@ -148,14 +148,53 @@
     };
 
     FM.fn.toggleArrows = function() {
-        console.error('toggleArrows');
         var self = this;
         var mainContainer = self.parent.config.element;
         var sides = mainContainer.querySelectorAll('.js-side');
         var sidesArray = Array.prototype.slice.call(sides);
 
-        sidesArray.forEach(function() {
-            console.log(arguments);
+        sidesArray.forEach(function(element) {
+            var nextSibling = element.nextSibling;
+            var previousSibling = element.previousSibling;
+
+            var currentMonthIndex = +element.getAttribute('data-month');
+            var currentYearIndex = +element.getAttribute('data-year');
+
+            if (nextSibling) {
+                var nextSiblingMonthIndex = +nextSibling.getAttribute('data-month');
+                var nextSiblingYearIndex = +nextSibling.getAttribute('data-year');
+                var monthsDiffRight = nextSiblingMonthIndex - currentMonthIndex;
+                var yearsDiffRight = nextSiblingYearIndex - currentYearIndex;
+
+                if (monthsDiffRight === 1 && yearsDiffRight === 0 || monthsDiffRight === -11) {
+                    var elemArrowRight = element.querySelector('.js-nav-right');
+
+                    elemArrowRight.classList.add('invisible');
+                }
+                else {
+                    var nextSiblingArrowLeft = nextSibling.querySelector('.js-nav-left');
+
+                    nextSiblingArrowLeft.classList.remove('invisible');
+                }
+            }
+
+            if (previousSibling) {
+                var previousSiblingMonthIndex = +previousSibling.getAttribute('data-month');
+                var previousSiblingYearIndex = +previousSibling.getAttribute('data-year');
+                var monthsDiffLeft = currentMonthIndex - previousSiblingMonthIndex;
+                var yearsDiffLeft = currentYearIndex - previousSiblingYearIndex;
+
+                if (monthsDiffLeft === 1 && yearsDiffLeft === 0 || monthsDiffLeft === -11) {
+                    var elemArrowLeft = element.querySelector('.js-nav-left');
+
+                    elemArrowLeft.classList.add('invisible');
+                }
+                else {
+                    var previousSiblingArrowRight = previousSibling.querySelector('.js-nav-right');
+
+                    previousSiblingArrowRight.classList.remove('invisible');
+                }
+            }
         });
     };
 
@@ -171,6 +210,8 @@
 
             self.initListeners(fragment);
         }
+
+        self.toggleArrows();
     };
 
     FM.fn.renderFragment = function(fragmentIndex) {
@@ -182,6 +223,8 @@
             var container = mainContainer.querySelector(calendarObj.containerClassName);
 
             container.innerHTML = '';
+            container.setAttribute('data-month', calendarObj.index);
+            container.setAttribute('data-year', calendarObj.year);
             container.appendChild(calendarObj.fragmentHtml);
 
             self.initListeners(container);
@@ -216,7 +259,7 @@
         var tableCaption = self.parent.fragmentsFactory.createTableCaption(nextMonthIndex, nextYear);
         var calendarHtml = self.parent.fragmentsFactory.creteFragment(nextMonthIndex, nextYear);
 
-        container.classList.add('js-side', 'display-table-cell');
+        container.classList.add('display-table-cell');
 
         container.appendChild(tableCaption);
         container.appendChild(calendarHtml);
@@ -385,7 +428,7 @@
             var align = type === 'left' ? 'align-left' : 'align-right';
 
             cellContainer.classList.add(align, 'display-table-cell', 'vertical-align-middle');
-            arrowsContainer.classList.add('js-nav-elem', 'drp-arrows-container', 'display-inline-block', 'relative');
+            arrowsContainer.classList.add('js-nav-elem', 'js-nav-' + type, 'drp-arrows-container', 'display-inline-block', 'relative');
 
             arrow.classList.add(iconClass, 'parent-size', 'absolute');
             circle.classList.add('drp-svg-circle', 'parent-size', 'absolute');
@@ -541,11 +584,13 @@
         return tableWrapper;
     };
 
-    FF.fn.creteFragmentContainer = function(month) {
+    FF.fn.creteFragmentContainer = function(month, year) {
         var container = document.createElement('div');
         var sideName = '.js-side-' + month;
 
-        container.classList.add(sideName.slice(1), 'drp-side', 'display-table-cell');
+        container.classList.add(sideName.slice(1), 'js-side', 'drp-side', 'display-table-cell');
+        container.setAttribute('data-month', month);
+        container.setAttribute('data-year', year);
 
         return container;
     };
@@ -642,12 +687,12 @@
         self.fragmentsManager.fragments = {};
 
         for (var i = 0; i < self.config.fragmentsNumber; i++) {
-            var fragmentContainer = self.fragmentsFactory.creteFragmentContainer(currentMonth);
+            var fragmentContainer = self.fragmentsFactory.creteFragmentContainer(currentMonth, currentYear);
             var container = document.createElement('div');
             var tableCaption = self.fragmentsFactory.createTableCaption(currentMonth, currentYear);
             var table = self.fragmentsFactory.creteFragment(currentMonth, currentYear);
 
-            container.classList.add('js-side', 'display-table-cell');
+            container.classList.add('display-table-cell');
 
             container.appendChild(tableCaption);
             container.appendChild(table);
