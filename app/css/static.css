@@ -7,3 +7,7 @@ body {
     border: 1px solid #94a8bc;
     border-top-width: 0;
 }
+
+.gap {
+    width: 20px;
+}

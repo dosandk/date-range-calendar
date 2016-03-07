@@ -141,8 +141,22 @@
                     monthIndex: month,
                     nextMonthIndex: nextMonth
                 });
+
+                self.toggleArrows();
             });
         }
+    };
+
+    FM.fn.toggleArrows = function() {
+        console.error('toggleArrows');
+        var self = this;
+        var mainContainer = self.parent.config.element;
+        var sides = mainContainer.querySelectorAll('.js-side');
+        var sidesArray = Array.prototype.slice.call(sides);
+
+        sidesArray.forEach(function() {
+            console.log(arguments);
+        });
     };
 
     FM.fn.renderAllFragments = function() {
@@ -198,7 +212,14 @@
         var currentYear = data.year;
         var currentCalendar = self.fragments[currentYear + '-' + monthIndex];
         var nextYear = typeof data.nextYear !== 'undefined' ? data.nextYear : currentCalendar.year;
+        var container = document.createElement('div');
+        var tableCaption = self.parent.fragmentsFactory.createTableCaption(nextMonthIndex, nextYear);
         var calendarHtml = self.parent.fragmentsFactory.creteFragment(nextMonthIndex, nextYear);
+
+        container.classList.add('js-side', 'display-table-cell');
+
+        container.appendChild(tableCaption);
+        container.appendChild(calendarHtml);
 
         if (typeof self.fragments[nextYear + '-' + nextMonthIndex] !== 'undefined') {
             console.error('this month already exist');
@@ -210,7 +231,7 @@
             currentCalendar.year = nextYear;
             currentCalendar.index = nextMonthIndex;
             currentCalendar.name = self.parent.config.monthNames[nextMonthIndex];
-            currentCalendar.fragmentHtml = calendarHtml;
+            currentCalendar.fragmentHtml = container;
 
             self.fragments[nextFragmentIndex] = currentCalendar;
             delete self.fragments[currentFragmentIndex];
@@ -335,6 +356,64 @@
 
     FF.fn = FF.prototype;
 
+    FF.fn.createTableCaption = function(month, year) {
+        var self = this;
+        var currentMonth = typeof month !== 'undefined' ? month : self.parent.month;
+        var currentYear = typeof year !== 'undefined' ? year : self.parent.year;
+        var monthName = self.parent.config.monthNames[currentMonth];
+
+        var tableCaption = document.createElement('div');
+        var tableCaptionInner = document.createElement('div');
+
+        tableCaption.classList.add('drp-caption');
+        tableCaptionInner.classList.add('display-table', 'parent-size');
+
+        var middleCell = document.createElement('div');
+        var middleCellTxt = document.createTextNode(monthName + ' ' + currentYear);
+
+        middleCell.classList.add('bold', 'display-table-cell', 'vertical-align-middle');
+        middleCell.appendChild(middleCellTxt);
+
+        function createArrows(type) {
+            var cellContainer = document.createElement('div');
+            var arrowsContainer = document.createElement('div');
+            var arrow = document.createElement('div');
+            var circle = document.createElement('div');
+
+            var iconClass = type === 'left' ? 'drp-svg-arrow-left' : 'drp-svg-arrow-right';
+            var state = type === 'left' ? 'prev' : 'next';
+            var align = type === 'left' ? 'align-left' : 'align-right';
+
+            cellContainer.classList.add(align, 'display-table-cell', 'vertical-align-middle');
+            arrowsContainer.classList.add('js-nav-elem', 'drp-arrows-container', 'display-inline-block', 'relative');
+
+            arrow.classList.add(iconClass, 'parent-size', 'absolute');
+            circle.classList.add('drp-svg-circle', 'parent-size', 'absolute');
+
+            arrowsContainer.setAttribute('data-month', currentMonth);
+            arrowsContainer.setAttribute('data-state', state);
+            arrowsContainer.setAttribute('data-year', currentYear);
+
+            arrowsContainer.appendChild(arrow);
+            arrowsContainer.appendChild(circle);
+
+            cellContainer.appendChild(arrowsContainer);
+
+            return cellContainer;
+        }
+
+        var leftCell = createArrows('left');
+        var rightCell = createArrows('right');
+
+        tableCaptionInner.appendChild(leftCell);
+        tableCaptionInner.appendChild(middleCell);
+        tableCaptionInner.appendChild(rightCell);
+
+        tableCaption.appendChild(tableCaptionInner);
+
+        return tableCaption;
+    };
+
     FF.fn.creteFragment = function(month, year) {
         var self = this;
         var currentMonth = typeof month !== 'undefined' ? month : self.parent.month;
@@ -450,62 +529,6 @@
             return tableBody;
         }
 
-        function createTableCaption() {
-            var monthName = self.parent.config.monthNames[currentMonth];
-
-            var tableCaption = document.createElement('div');
-            var tableCaptionInner = document.createElement('div');
-
-            tableCaption.classList.add('drp-caption');
-            tableCaptionInner.classList.add('display-table', 'parent-size');
-
-            var middleCell = document.createElement('div');
-            var middleCellTxt = document.createTextNode(monthName + ' ' + currentYear);
-
-            middleCell.classList.add('bold', 'display-table-cell', 'vertical-align-middle');
-            middleCell.appendChild(middleCellTxt);
-
-            function createArrows(type) {
-                var cellContainer = document.createElement('div');
-                var arrowsContainer = document.createElement('div');
-                var arrow = document.createElement('div');
-                var circle = document.createElement('div');
-
-                var iconClass = type === 'left' ? 'drp-svg-arrow-left' : 'drp-svg-arrow-right';
-                var state = type === 'left' ? 'prev' : 'next';
-                var align = type === 'left' ? 'align-left' : 'align-right';
-
-                cellContainer.classList.add(align, 'display-table-cell', 'vertical-align-middle');
-                arrowsContainer.classList.add('js-nav-elem', 'drp-arrows-container', 'display-inline-block', 'relative');
-
-                arrow.classList.add(iconClass, 'parent-size', 'absolute');
-                circle.classList.add('drp-svg-circle', 'parent-size', 'absolute');
-
-                arrowsContainer.setAttribute('data-month', currentMonth);
-                arrowsContainer.setAttribute('data-state', state);
-                arrowsContainer.setAttribute('data-year', currentYear);
-
-                arrowsContainer.appendChild(arrow);
-                arrowsContainer.appendChild(circle);
-
-                cellContainer.appendChild(arrowsContainer);
-
-                return cellContainer;
-            }
-
-            var leftCell = createArrows('left');
-            var rightCell = createArrows('right');
-
-            tableCaptionInner.appendChild(leftCell);
-            tableCaptionInner.appendChild(middleCell);
-            tableCaptionInner.appendChild(rightCell);
-
-            tableCaption.appendChild(tableCaptionInner);
-
-            return tableCaption;
-        }
-
-        var fragmentContainer = self.creteFragmentContainer(currentMonth);
         var tableWrapper = document.createElement('div');
         tableWrapper.classList.add('drp-table-wrapper');
 
@@ -513,11 +536,9 @@
         table.appendChild(createTableBody());
 
         tableWrapper.appendChild(table);
+        tableWrapper.appendChild(table);
 
-        fragmentContainer.appendChild(createTableCaption());
-        fragmentContainer.appendChild(tableWrapper);
-
-        return fragmentContainer;
+        return tableWrapper;
     };
 
     FF.fn.creteFragmentContainer = function(month) {
@@ -621,10 +642,22 @@
         self.fragmentsManager.fragments = {};
 
         for (var i = 0; i < self.config.fragmentsNumber; i++) {
+            var fragmentContainer = self.fragmentsFactory.creteFragmentContainer(currentMonth);
+            var container = document.createElement('div');
+            var tableCaption = self.fragmentsFactory.createTableCaption(currentMonth, currentYear);
+            var table = self.fragmentsFactory.creteFragment(currentMonth, currentYear);
+
+            container.classList.add('js-side', 'display-table-cell');
+
+            container.appendChild(tableCaption);
+            container.appendChild(table);
+
+            fragmentContainer.appendChild(container);
+
             self.fragmentsManager.setFragments({
                 year: currentYear,
                 monthIndex: currentMonth,
-                fragmentHtml: self.fragmentsFactory.creteFragment(currentMonth, currentYear),
+                fragmentHtml: fragmentContainer,
                 containerClassName: '.js-side-' + currentMonth
             });
 
