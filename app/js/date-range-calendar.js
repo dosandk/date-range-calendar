@@ -69,7 +69,7 @@
         month: new Date().getMonth(),
         fragmentsNumber: 2,
         daysPerWeek: 7,
-        daysNames: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        daysNames: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     };
 
@@ -496,7 +496,9 @@
             var daysInMonth = dateHelper.getNumberDaysInMonth(currentMonth, currentYear);
             var startCounter = 0;
             var daysCounter = 1;
-            var firstDay = daysNames[new Date(currentYear, currentMonth, 1).getDay()];
+            var dayIndex = new Date(currentYear, currentMonth, 1).getDay();
+            var dayIndexShifted = (dayIndex === 0) ? 6 : dayIndex - 1;
+            var firstDay = daysNames[dayIndexShifted];
             var startIndex = daysNames.indexOf(firstDay);
             var weeksCounter = Math.ceil((daysInMonth + startIndex)/daysPerWeek);
 
