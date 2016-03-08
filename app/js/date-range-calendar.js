@@ -617,8 +617,10 @@
 
             self.eventHandler = function(e) {
                 if (self.config.input.classList.contains('has-date-range-picker')) {
-                    self.calculatePosition(e);
-                    self.render();
+                    if (!self.config.input.classList.contains('shown')) {
+                        self.calculatePosition(e);
+                        self.render();
+                    }
                 }
             };
 
@@ -665,6 +667,15 @@
         self.fragmentsManager.renderAllFragments();
 
         self.initListeners();
+
+        var inputs = document.querySelectorAll('input.has-date-range-picker');
+        var inputsArr = Array.prototype.slice.call(inputs);
+
+        inputsArr.forEach(function(input) {
+            input.classList.remove('shown');
+        });
+
+        self.config.input.classList.add('shown');
     };
 
     Calendar.fn.resetCalendarContainer = function() {
@@ -817,17 +828,21 @@
         tick();
     }
 
-    document.addEventListener('click', function(e) {
+     function toggleDateRangePicker(e) {
         var element = e.target;
 
         if (element) {
             var isMainContainerShown = false;
             var mainContainer = document.querySelector('.date-range-container');
 
-            for (element; element != document.body && element.parentNode; element = element.parentNode) {
-                if (element.classList.contains('has-date-range-picker') || element.classList.contains('js-nav-elem')) {
-                    isMainContainerShown = true;
-                    break;
+            if (element != document && element != document.body) {
+                while (element) {
+                    if (element.classList && (element.classList.contains('has-date-range-picker') || element.classList.contains('js-nav-elem'))) {
+                        isMainContainerShown = true;
+                        break;
+                    }
+
+                    element = element.parentNode
                 }
             }
 
@@ -838,7 +853,9 @@
                 fadeIn(mainContainer);
             }
         }
-    });
+    }
+
+    document.addEventListener('click', toggleDateRangePicker);
 
     Calendar.fn.destroy = function() {
         var self = this;
