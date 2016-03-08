@@ -203,6 +203,8 @@
         var mainContainer = self.parent.config.element;
         var sidesContainer = mainContainer.querySelector('.js-sides-container');
 
+        self.parent.config.element.style.opacity = 0;
+
         for (var i in self.fragments) {
             var fragment = self.fragments[i].fragmentHtml;
 
@@ -832,13 +834,13 @@
         var element = e.target;
 
         if (element) {
-            var isMainContainerShown = false;
+            var showMainContainer = false;
             var mainContainer = document.querySelector('.date-range-container');
 
             if (element != document && element != document.body) {
                 while (element) {
                     if (element.classList && (element.classList.contains('has-date-range-picker') || element.classList.contains('js-nav-elem'))) {
-                        isMainContainerShown = true;
+                        showMainContainer = true;
                         break;
                     }
 
@@ -846,11 +848,11 @@
                 }
             }
 
-            if (!isMainContainerShown) {
-                fadeOut(mainContainer);
+            if (showMainContainer) {
+                fadeIn(mainContainer);
             }
             else {
-                fadeIn(mainContainer);
+                fadeOut(mainContainer);
             }
         }
     }
