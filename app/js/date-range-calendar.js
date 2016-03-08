@@ -305,14 +305,17 @@
                     self.updateDateRange(timestamp);
 
                     target.classList.remove('selected');
+
+                    self.resetInput();
                 }
                 else {
                     self.resetDateRange();
                     self.setDateRange(timestamp);
-                    self.showDateRange();
 
                     target.classList.add('selected');
                 }
+
+                self.showDateRange();
             }
         });
     };
