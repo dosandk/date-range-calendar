@@ -1,11 +1,19 @@
 {
-  "name": "date-range-calendar",
-  "version": "1.0.0",
-  "description": "",
-  "main": "gulpfile.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC"
+    "name": "date-range-picker",
+    "version": "0.0.1",
+    "description": "",
+    "main": "gulpfile.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/dosandk/date-range-picker.git"
+    },
+    "bugs": {
+        "url": "https://github.com/dosandk/date-range-picker/issues"
+    },
+    "homepage": "https://github.com/dosandk/date-range-picker#readme",
+    "author": "Vladimir Shevchuk <dosandkv@gmail.com>",
+    "license": "MIT"
 }
