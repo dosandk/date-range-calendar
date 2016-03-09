@@ -1,13 +1,11 @@
 ;(function(root, factory) {
     if (typeof define === 'function' && define.amd) {
-        define([''], function() {
-
-        });
+        define(function() { return factory() });
     }
-    else if (typeof exports !== 'undefined') {
-
+    else if (typeof exports !== 'undefined' && typeof module === 'object') {
+        module.exports = factory();
     }
-    else {
+    else if (typeof window.Calendar === 'undefined' || typeof window.Calendar !== 'function') {
         root.Calendar = factory();
     }
 
