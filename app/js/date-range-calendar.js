@@ -47,15 +47,18 @@
         return day + ' ' + monthName + ' ' + year;
     }
 
-    var dom = {
-        createElement: function(elemName) {
-            var elementName = elemName || 'div';
+    function $(selector, scope) {
+        var currentScope = scope || document;
+        var elements = currentScope.querySelectorAll(selector);
+        var elementsArr = Array.prototype.slice.call(elements);
 
-            return document.createElement(elementName);
-        },
-        addClass: function(element, classNames) {
-            return element.className = classNames;
-        }
+        return elementsArr;
+    }
+
+    $.createElement = function(elemName) {
+        var elementName = elemName || 'div';
+
+        return document.createElement(elementName);
     };
 
     var defaultConfig = {
@@ -104,7 +107,7 @@
 
     FM.fn.initMonthSwitchingEvent = function(elem) {
         var self = this;
-        var arrows = elem.querySelectorAll('.js-nav-elem');
+        var arrows = $('.js-nav-elem', elem);
         var arrowIndex = arrows.length;
 
         while (arrowIndex--) {
@@ -148,10 +151,9 @@
     FM.fn.toggleArrows = function() {
         var self = this;
         var mainContainer = self.parent.config.element;
-        var sides = mainContainer.querySelectorAll('.js-side');
-        var sidesArray = Array.prototype.slice.call(sides);
+        var sides = $('.js-side', mainContainer);
 
-        sidesArray.forEach(function(element) {
+        sides.forEach(function(element) {
             var nextSibling = element.nextSibling;
             var previousSibling = element.previousSibling;
 
@@ -255,7 +257,7 @@
         var currentYear = data.year;
         var currentCalendar = self.fragments[currentYear + '-' + monthIndex];
         var nextYear = typeof data.nextYear !== 'undefined' ? data.nextYear : currentCalendar.year;
-        var container = document.createElement('div');
+        var container = $.createElement();
         var tableCaption = self.parent.fragmentsFactory.createTableCaption(nextMonthIndex, nextYear);
         var calendarHtml = self.parent.fragmentsFactory.creteFragment(nextMonthIndex, nextYear);
 
@@ -368,17 +370,15 @@
             self.selectedDateRange.end = null;
 
             var mainContainer = self.parent.config.element;
-            var sidesContainer = mainContainer.querySelector('.js-sides-container');
-            var selectedDays = sidesContainer.querySelectorAll('.selected');
-            var hoveredDays = sidesContainer.querySelectorAll('.hovered');
-            var hoveredDaysArr = Array.prototype.slice.call(hoveredDays);
-            var selectedDaysArr = Array.prototype.slice.call(selectedDays);
+            var sidesContainer = $('.js-sides-container', mainContainer);
+            var selectedDays = $('.selected', sidesContainer);
+            var hoveredDays = $('.hovered', sidesContainer);
 
-            selectedDaysArr.forEach(function(cell) {
+            selectedDays.forEach(function(cell) {
                 cell.classList.remove('selected');
             });
 
-            hoveredDaysArr.forEach(function(cell) {
+            hoveredDays.forEach(function(cell) {
                 cell.classList.remove('hovered');
             });
         }
@@ -408,23 +408,23 @@
         var currentYear = typeof year !== 'undefined' ? year : self.parent.year;
         var monthName = self.parent.config.monthNames[currentMonth];
 
-        var tableCaption = document.createElement('div');
-        var tableCaptionInner = document.createElement('div');
+        var tableCaption = $.createElement();
+        var tableCaptionInner = $.createElement();
 
         tableCaption.classList.add('drp-caption');
         tableCaptionInner.classList.add('display-table', 'parent-size');
 
-        var middleCell = document.createElement('div');
+        var middleCell = $.createElement();
         var middleCellTxt = document.createTextNode(monthName + ' ' + currentYear);
 
         middleCell.classList.add('bold', 'display-table-cell', 'vertical-align-middle');
         middleCell.appendChild(middleCellTxt);
 
         function createArrows(type) {
-            var cellContainer = document.createElement('div');
-            var arrowsContainer = document.createElement('div');
-            var arrow = document.createElement('div');
-            var circle = document.createElement('div');
+            var cellContainer = $.createElement();
+            var arrowsContainer = $.createElement();
+            var arrow = $.createElement();
+            var circle = $.createElement();
 
             var iconClass = type === 'left' ? 'drp-svg-arrow-left' : 'drp-svg-arrow-right';
             var state = type === 'left' ? 'prev' : 'next';
@@ -464,20 +464,20 @@
         var self = this;
         var currentMonth = typeof month !== 'undefined' ? month : self.parent.month;
         var currentYear = typeof year !== 'undefined' ? year : self.parent.year;
-        var table = dom.createElement('table');
+        var table = $.createElement('table');
         var daysPerWeek = self.parent.config.daysPerWeek;
         var daysNames = self.parent.config.daysNames;
 
         table.classList.add('drp-table', 'fixed-table-layout', 'parent-width', 'txt-align-center');
 
         function createTableHeader() {
-            var tableHeader = dom.createElement('thead');
-            var row = dom.createElement('tr');
+            var tableHeader = $.createElement('thead');
+            var row = $.createElement('tr');
 
             tableHeader.classList.add('drp-thead');
 
             for (var i = 0; i < daysNames.length; i++) {
-                var cell = dom.createElement('td');
+                var cell = $.createElement('td');
                 var text = document.createTextNode(daysNames[i]);
 
                 cell.appendChild(text);
@@ -490,7 +490,7 @@
         }
 
         function createTableBody() {
-            var tableBody = dom.createElement('tbody');
+            var tableBody = $.createElement('tbody');
             var daysInMonth = dateHelper.getNumberDaysInMonth(currentMonth, currentYear);
             var startCounter = 0;
             var daysCounter = 1;
@@ -508,7 +508,7 @@
 
                 for (dayIndex; dayIndex < daysPerWeek; dayIndex++) {
                     if (daysCounter <= daysInMonth) {
-                        cell = dom.createElement('td');
+                        cell = $.createElement('td');
                         text = document.createTextNode('');
 
                         cell.classList.add('drp-td');
@@ -560,7 +560,7 @@
                 var week;
 
                 for (weekIndex; weekIndex < weeksCounter; weekIndex++) {
-                    row = dom.createElement('tr');
+                    row = $.createElement('tr');
                     week = createCells();
 
                     row.classList.add('drp-row');
@@ -577,7 +577,8 @@
             return tableBody;
         }
 
-        var tableWrapper = document.createElement('div');
+        var tableWrapper = $.createElement();
+
         tableWrapper.classList.add('drp-table-wrapper');
 
         table.appendChild(createTableHeader());
@@ -590,7 +591,7 @@
     };
 
     FF.fn.creteFragmentContainer = function(month, year) {
-        var container = document.createElement('div');
+        var container = $.createElement();
         var sideName = '.js-side-' + month;
 
         container.classList.add(sideName.slice(1), 'js-side', 'drp-side', 'display-table-cell');
@@ -608,12 +609,11 @@
         self.fragmentsFactory = new FragmentsFactory({ parent: self });
 
         var elementSelector = self.config.elementSelector || defaultConfig.elementSelector;
-        var elements = document.querySelectorAll(elementSelector);
-        var elementsArr = Array.prototype.slice.call(elements);
+        var elements = $(elementSelector);
 
         self.createMainContainer();
 
-        elementsArr.forEach(function(element) {
+        elements.forEach(function(element) {
             self.config.input = element;
             self.config.input.classList.add('has-date-range-picker');
 
@@ -647,7 +647,7 @@
         var mainContainer = document.querySelector(defaultConfig.calendarContainer);
 
         if (!mainContainer) {
-            mainContainer = document.createElement('div');
+            mainContainer = $.createElement();
             mainContainer.classList.add(defaultConfig.calendarContainer.slice(1), 'hide');
 
             document.body.appendChild(mainContainer);
@@ -670,10 +670,9 @@
 
         self.initListeners();
 
-        var inputs = document.querySelectorAll('input.has-date-range-picker');
-        var inputsArr = Array.prototype.slice.call(inputs);
+        var inputs = $('input.has-date-range-picker');
 
-        inputsArr.forEach(function(input) {
+        inputs.forEach(function(input) {
             input.classList.remove('shown');
         });
 
@@ -687,7 +686,7 @@
     Calendar.fn.createCalendarContainer = function() {
         var self = this;
         var mainContainer = self.config.element;
-        var field = dom.createElement();
+        var field = $.createElement();
 
         mainContainer.classList.add('has-date-range-picker');
 
@@ -704,7 +703,7 @@
 
         for (var i = 0; i < self.config.fragmentsNumber; i++) {
             var fragmentContainer = self.fragmentsFactory.creteFragmentContainer(currentMonth, currentYear);
-            var container = document.createElement('div');
+            var container = $.createElement();
             var tableCaption = self.fragmentsFactory.createTableCaption(currentMonth, currentYear);
             var table = self.fragmentsFactory.creteFragment(currentMonth, currentYear);
 
@@ -765,10 +764,9 @@
         var self = this;
         var mainContainer = self.config.element;
         var sidesContainer = mainContainer.querySelector('.js-sides-container');
-        var cells = sidesContainer.querySelectorAll('.day');
-        var cellsArr = Array.prototype.slice.call(cells);
+        var cells = $('.day', sidesContainer);
 
-        cellsArr.forEach(function(cell) {
+        cells.forEach(function(cell) {
             var cellTimestamp = parseInt(cell.getAttribute('data-timestamp'), 10);
             var start = self.fragmentsManager.selectedDateRange.start;
 
