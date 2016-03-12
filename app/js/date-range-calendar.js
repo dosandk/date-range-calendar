@@ -13,28 +13,11 @@
 
     var dateHelper = {
         getNumberDaysInMonth: function(month, year) {
-            var self = this;
             var date = new Date();
             var currentYear = typeof year !== 'undefined' ?  year : date.getFullYear();
             var currentMonth = typeof month !== 'undefined' ? month : date.getMonth();
 
             return new Date(currentYear, currentMonth + 1, 0).getDate();
-        },
-        /*getMonthFirstDay: function(month, year) {
-            var self = this;
-            var date = new Date();
-            var currentYear = typeof year !== 'undefined' ?  year : date.getFullYear();
-            var currentMonth = typeof month !== 'undefined' ? month : date.getMonth();
-
-            return new Date(currentYear, currentMonth, 1);
-        },*/
-        getMonthLastDay: function(month, year) {
-            var self = this;
-            var date = new Date();
-            var currentYear = typeof year !== 'undefined' ?  year : date.getFullYear();
-            var currentMonth = typeof month !== 'undefined' ? month : date.getMonth();
-
-            return new Date(currentYear, currentMonth + 1, 0);
         }
     };
 
@@ -48,7 +31,17 @@
     }
 
     function $(selector, scope) {
-        var currentScope = scope || document;
+        var currentScope = document;
+
+        if (typeof scope !== 'undefined') {
+            if (Array.isArray(scope)) {
+                currentScope = scope[0];
+            }
+            else {
+                currentScope = scope;
+            }
+        }
+
         var elements = currentScope.querySelectorAll(selector);
         var elementsArr = Array.prototype.slice.call(elements);
 
@@ -62,6 +55,7 @@
     };
 
     var defaultConfig = {
+        LAST_MONTH_INDEX: 11,
         input: null,
         element: null,
         elementSelector: '.date-range-picker',
@@ -72,6 +66,10 @@
         daysPerWeek: 7,
         daysNames: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    };
+
+    var messages = {
+        error: 'this month already exist'
     };
 
     function extendConfig(customConf) {
@@ -108,10 +106,9 @@
     FM.fn.initMonthSwitchingEvent = function(elem) {
         var self = this;
         var arrows = $('.js-nav-elem', elem);
-        var arrowIndex = arrows.length;
 
-        while (arrowIndex--) {
-            arrows[arrowIndex].addEventListener('click', function(e) {
+        arrows.forEach(function(arrow) {
+            arrow.addEventListener('click', function(e) {
                 var month = parseInt(e.currentTarget.getAttribute('data-month'), 10);
                 var state = e.currentTarget.getAttribute('data-state');
                 var currentYear = parseInt(e.currentTarget.getAttribute('data-year'), 10);
@@ -129,9 +126,9 @@
 
                 if (nextMonth < 0) {
                     nextYear = currentYear - 1;
-                    nextMonth = 11;
+                    nextMonth = defaultConfig.LAST_MONTH_INDEX;
                 }
-                else if (nextMonth > 11) {
+                else if (nextMonth > defaultConfig.LAST_MONTH_INDEX) {
                     nextYear = currentYear + 1;
                     nextMonth = 0;
                 }
@@ -145,7 +142,7 @@
 
                 self.toggleArrows();
             });
-        }
+        });
     };
 
     FM.fn.toggleArrows = function() {
@@ -166,13 +163,13 @@
                 var monthsDiffRight = nextSiblingMonthIndex - currentMonthIndex;
                 var yearsDiffRight = nextSiblingYearIndex - currentYearIndex;
 
-                if (monthsDiffRight === 1 && yearsDiffRight === 0 || monthsDiffRight === -11) {
-                    var elemArrowRight = element.querySelector('.js-nav-right');
+                if (monthsDiffRight === 1 && yearsDiffRight === 0 || monthsDiffRight === -defaultConfig.LAST_MONTH_INDEX) {
+                    var elemArrowRight = $('.js-nav-right', element)[0];
 
                     elemArrowRight.classList.add('invisible');
                 }
                 else {
-                    var nextSiblingArrowLeft = nextSibling.querySelector('.js-nav-left');
+                    var nextSiblingArrowLeft = $('.js-nav-left', nextSibling)[0];
 
                     nextSiblingArrowLeft.classList.remove('invisible');
                 }
@@ -184,13 +181,13 @@
                 var monthsDiffLeft = currentMonthIndex - previousSiblingMonthIndex;
                 var yearsDiffLeft = currentYearIndex - previousSiblingYearIndex;
 
-                if (monthsDiffLeft === 1 && yearsDiffLeft === 0 || monthsDiffLeft === -11) {
-                    var elemArrowLeft = element.querySelector('.js-nav-left');
+                if (monthsDiffLeft === 1 && yearsDiffLeft === 0 || monthsDiffLeft === -defaultConfig.LAST_MONTH_INDEX) {
+                    var elemArrowLeft = $('.js-nav-left', element)[0];
 
                     elemArrowLeft.classList.add('invisible');
                 }
                 else {
-                    var previousSiblingArrowRight = previousSibling.querySelector('.js-nav-right');
+                    var previousSiblingArrowRight = $('.js-nav-right', previousSibling)[0];
 
                     previousSiblingArrowRight.classList.remove('invisible');
                 }
@@ -201,12 +198,13 @@
     FM.fn.renderAllFragments = function() {
         var self = this;
         var mainContainer = self.parent.config.element;
-        var sidesContainer = mainContainer.querySelector('.js-sides-container');
+        var sidesContainer = $('.js-sides-container', mainContainer)[0];
+        var index;
 
         self.parent.config.element.style.opacity = 0;
 
-        for (var i in self.fragments) {
-            var fragment = self.fragments[i].fragmentHtml;
+        for (index in self.fragments) {
+            var fragment = self.fragments[index].fragmentHtml;
 
             sidesContainer.appendChild(fragment);
 
@@ -222,7 +220,7 @@
         if (typeof fragmentIndex !== 'undefined') {
             var calendarObj = self.fragments[fragmentIndex];
             var mainContainer = self.parent.config.element;
-            var container = mainContainer.querySelector(calendarObj.containerClassName);
+            var container = $(calendarObj.containerClassName, mainContainer)[0];
 
             container.innerHTML = '';
             container.setAttribute('data-month', calendarObj.index);
@@ -267,7 +265,7 @@
         container.appendChild(calendarHtml);
 
         if (typeof self.fragments[nextYear + '-' + nextMonthIndex] !== 'undefined') {
-            console.error('this month already exist');
+            console.error(messages.error);
         }
         else  {
             var currentFragmentIndex = currentYear + '-' + monthIndex;
@@ -294,7 +292,7 @@
 
     FM.fn.initGetTimestampEvent = function(elem) {
         var self = this;
-        var tbody = elem.querySelector('tbody');
+        var tbody = $('tbody', elem)[0];
 
         tbody.addEventListener('click', function(e) {
             var target = e.target;
@@ -344,15 +342,17 @@
         var start = self.selectedDateRange.start;
         var end = self.selectedDateRange.end;
         var input = self.parent.config.input;
+        var startLabelTxt = 'Start: ';
+        var endLabelTxt = ' End: ';
 
         self.resetInput();
 
         if (start) {
-            input.value = 'Start: ' + formatDate(start);
+            input.value = startLabelTxt + formatDate(start);
         }
 
         if (end) {
-            input.value += ' End: ' + formatDate(end);
+            input.value += endLabelTxt + formatDate(end);
         }
     };
 
@@ -425,10 +425,15 @@
             var arrowsContainer = $.createElement();
             var arrow = $.createElement();
             var circle = $.createElement();
+            var iconClass = 'drp-svg-arrow-right';
+            var state = 'next';
+            var align = 'align-right';
 
-            var iconClass = type === 'left' ? 'drp-svg-arrow-left' : 'drp-svg-arrow-right';
-            var state = type === 'left' ? 'prev' : 'next';
-            var align = type === 'left' ? 'align-left' : 'align-right';
+            if (type === 'left') {
+                iconClass = 'drp-svg-arrow-left';
+                state =  'prev';
+                align = 'align-left';
+            }
 
             cellContainer.classList.add(align, 'display-table-cell', 'vertical-align-middle');
             arrowsContainer.classList.add('js-nav-elem', 'js-nav-' + type, 'drp-arrows-container', 'display-inline-block', 'relative');
@@ -476,13 +481,13 @@
 
             tableHeader.classList.add('drp-thead');
 
-            for (var i = 0; i < daysNames.length; i++) {
+            daysNames.forEach(function(dayName) {
                 var cell = $.createElement('td');
-                var text = document.createTextNode(daysNames[i]);
+                var text = document.createTextNode(dayName);
 
                 cell.appendChild(text);
                 row.appendChild(cell);
-            }
+            });
 
             tableHeader.appendChild(row);
 
@@ -615,10 +620,10 @@
 
         elements.forEach(function(element) {
             self.config.input = element;
-            self.config.input.classList.add('has-date-range-picker');
+            self.config.input.classList.add('js-has-drp');
 
             self.eventHandler = function(e) {
-                if (self.config.input.classList.contains('has-date-range-picker')) {
+                if (self.config.input.classList.contains('js-has-drp')) {
                     if (!self.config.input.classList.contains('shown')) {
                         self.calculatePosition(e);
                         self.render();
@@ -644,7 +649,7 @@
 
     Calendar.fn.createMainContainer = function() {
         var self = this;
-        var mainContainer = document.querySelector(defaultConfig.calendarContainer);
+        var mainContainer = $(defaultConfig.calendarContainer)[0];
 
         if (!mainContainer) {
             mainContainer = $.createElement();
@@ -670,7 +675,7 @@
 
         self.initListeners();
 
-        var inputs = $('input.has-date-range-picker');
+        var inputs = $('input.js-has-drp');
 
         inputs.forEach(function(input) {
             input.classList.remove('shown');
@@ -688,7 +693,7 @@
         var mainContainer = self.config.element;
         var field = $.createElement();
 
-        mainContainer.classList.add('has-date-range-picker');
+        mainContainer.classList.add('js-has-drp');
 
         field.classList.add('js-sides-container', 'drp-sides-container', 'display-table', 'parent-size');
         mainContainer.appendChild(field);
@@ -698,10 +703,11 @@
         var self = this;
         var currentMonth = self.month;
         var currentYear = self.year;
+        var fragmentsNumber = self.config.fragmentsNumber;
 
         self.fragmentsManager.fragments = {};
 
-        for (var i = 0; i < self.config.fragmentsNumber; i++) {
+        while (fragmentsNumber--) {
             var fragmentContainer = self.fragmentsFactory.creteFragmentContainer(currentMonth, currentYear);
             var container = $.createElement();
             var tableCaption = self.fragmentsFactory.createTableCaption(currentMonth, currentYear);
@@ -721,7 +727,7 @@
                 containerClassName: '.js-side-' + currentMonth
             });
 
-            if (currentMonth < 11) {
+            if (currentMonth < defaultConfig.LAST_MONTH_INDEX) {
                 currentMonth++;
             }
             else {
@@ -740,7 +746,7 @@
     Calendar.fn.initCellHoverEffect = function() {
         var self = this;
         var mainContainer = self.config.element;
-        var sidesContainer = mainContainer.querySelector('.js-sides-container');
+        var sidesContainer = $('.js-sides-container', mainContainer)[0];
 
         sidesContainer.addEventListener('mouseover', function(e) {
             var start = self.fragmentsManager.selectedDateRange.start;
@@ -763,7 +769,7 @@
     Calendar.fn.hoverCells = function(timestamp) {
         var self = this;
         var mainContainer = self.config.element;
-        var sidesContainer = mainContainer.querySelector('.js-sides-container');
+        var sidesContainer = $('.js-sides-container', mainContainer);
         var cells = $('.day', sidesContainer);
 
         cells.forEach(function(cell) {
@@ -785,7 +791,8 @@
     function fadeIn(el, speed) {
         var elementOpacity = el.style.opacity ? parseInt(el.style.opacity, 10) : 0;
         var last = +new Date();
-        var animationSpeed = typeof speed !== 'undefined' ? speed : 400;
+        var defaultSpeed = 400;
+        var animationSpeed = typeof speed !== 'undefined' ? speed : defaultSpeed;
         var FPS = 16;
 
         el.classList.remove('hide');
@@ -808,7 +815,8 @@
     function fadeOut(el, speed) {
         var elementOpacity = el.style.opacity ? parseInt(el.style.opacity, 10) : 0;
         var last = +new Date();
-        var animationSpeed = typeof speed !== 'undefined' ? speed : 400;
+        var defaultSpeed = 400;
+        var animationSpeed = typeof speed !== 'undefined' ? speed : defaultSpeed;
         var FPS = 16;
 
         var tick = function() {
@@ -833,11 +841,11 @@
 
         if (element) {
             var showMainContainer = false;
-            var mainContainer = document.querySelector('.date-range-container');
+            var mainContainer = $('.date-range-container')[0];
 
             if (element != document && element != document.body) {
                 while (element) {
-                    if (element.classList && (element.classList.contains('has-date-range-picker') || element.classList.contains('js-nav-elem'))) {
+                    if (element.classList && (element.classList.contains('js-has-drp') || element.classList.contains('js-nav-elem'))) {
                         showMainContainer = true;
                         break;
                     }
@@ -862,7 +870,7 @@
         var input = self.config.input;
 
         input.removeEventListener('click', self.eventHandler);
-        input.classList. remove('has-date-range-picker');
+        input.classList. remove('js-has-drp');
     };
 
     return Calendar;
