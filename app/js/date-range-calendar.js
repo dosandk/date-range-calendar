@@ -57,7 +57,7 @@
         input: null,
         element: null,
         elementSelector: '.date-range-picker',
-        calendarContainer: '.date-range-container',
+        calendarContainer: '.js-drp-container',
         year: new Date().getFullYear(),
         month: new Date().getMonth(),
         fragmentsNumber: 2,
@@ -634,7 +634,7 @@
 
             if (!mainContainer) {
                 mainContainer = $.createElement();
-                mainContainer.classList.add(defaultConfig.calendarContainer.slice(1), 'hide');
+                mainContainer.classList.add(defaultConfig.calendarContainer.slice(1), 'drp-container', 'none-selectable', 'hide');
 
                 document.body.appendChild(mainContainer);
             }
@@ -855,7 +855,7 @@
 
         if (element) {
             var showMainContainer = false;
-            var mainContainer = $('.date-range-container')[0];
+            var mainContainer = $(defaultConfig.calendarContainer)[0];
 
             if (element != document && element != document.body) {
                 while (element) {
