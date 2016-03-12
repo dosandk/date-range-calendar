@@ -43,9 +43,8 @@
         }
 
         var elements = currentScope.querySelectorAll(selector);
-        var elementsArr = Array.prototype.slice.call(elements);
 
-        return elementsArr;
+        return Array.prototype.slice.call(elements);
     }
 
     $.createElement = function(elemName) {
@@ -79,11 +78,13 @@
             configExtended = {};
 
             for (var prop in defaultConfig) {
-                if (customConf[prop]) {
-                    configExtended[prop] = customConf[prop];
-                }
-                else {
-                    configExtended[prop] = defaultConfig[prop];
+                if (defaultConfig.hasOwnProperty(prop)) {
+                    if (customConf[prop]) {
+                        configExtended[prop] = customConf[prop];
+                    }
+                    else {
+                        configExtended[prop] = defaultConfig[prop];
+                    }
                 }
             }
         }
@@ -91,7 +92,7 @@
         return configExtended;
     }
 
-    var FragmentsManager = FM = function(data) {
+    var FragmentsManager = function(data) {
         this.parent = data.parent;
         this.fragments = {};
 
@@ -100,6 +101,8 @@
             end: null
         };
     };
+
+    var FM = FragmentsManager;
 
     FM.fn = FM.prototype;
 
@@ -204,11 +207,13 @@
         self.parent.config.element.style.opacity = 0;
 
         for (index in self.fragments) {
-            var fragment = self.fragments[index].fragmentHtml;
+            if (self.fragments.hasOwnProperty(index)) {
+                var fragment = self.fragments[index].fragmentHtml;
 
-            sidesContainer.appendChild(fragment);
+                sidesContainer.appendChild(fragment);
 
-            self.initListeners(fragment);
+                self.initListeners(fragment);
+            }
         }
 
         self.toggleArrows();
@@ -396,9 +401,11 @@
         }
     };
 
-    var FragmentsFactory = FF = function(data) {
+    var FragmentsFactory = function(data) {
         this.parent = data.parent;
     };
+
+    var FF = FragmentsFactory;
 
     FF.fn = FF.prototype;
 

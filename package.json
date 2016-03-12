@@ -1,19 +1,26 @@
 {
-    "name": "daterange-picker",
-    "version": "0.0.1",
-    "description": "",
-    "main": "gulpfile.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/dosandk/date-range-picker.git"
-    },
-    "bugs": {
-        "url": "https://github.com/dosandk/date-range-picker/issues"
-    },
-    "homepage": "https://github.com/dosandk/date-range-picker#readme",
-    "author": "Vladimir Shevchuk <dosandkv@gmail.com>",
-    "license": "MIT"
+  "name": "daterange-picker",
+  "version": "0.0.1",
+  "description": "",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dosandk/date-range-picker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dosandk/date-range-picker/issues"
+  },
+  "homepage": "https://github.com/dosandk/date-range-picker#readme",
+  "author": "Vladimir Shevchuk <dosandkv@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "browser-sync": "^2.11.1",
+    "gulp-clean": "^0.3.2",
+    "gulp-compass": "^2.1.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-cssnano": "^2.1.1"
+  }
 }

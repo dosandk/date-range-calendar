@@ -1,13 +1,1 @@
-body {
-    background: pink;
-}
-.date-range-container {
-    margin: 20px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .5);
-    border: 1px solid #94a8bc;
-    border-top-width: 0;
-}
-
-.gap {
-    width: 20px;
-}
+body{background:pink}.date-range-container{margin:20px;box-shadow:0 1px 2px 0 rgba(0,0,0,0.5);border:1px solid #94a8bc;border-top-width:0}.gap{width:20px}
