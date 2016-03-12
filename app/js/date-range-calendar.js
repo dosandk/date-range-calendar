@@ -18,17 +18,16 @@
             var currentMonth = typeof month !== 'undefined' ? month : date.getMonth();
 
             return new Date(currentYear, currentMonth + 1, 0).getDate();
+        },
+        formatDate: function(timestamp) {
+            var year = new Date(timestamp).getFullYear();
+            var month = new Date(timestamp).getMonth();
+            var monthName = defaultConfig.monthNames[month];
+            var day = new Date(timestamp).getDate();
+
+            return day + ' ' + monthName + ' ' + year;
         }
     };
-
-    function formatDate(timestamp) {
-        var year = new Date(timestamp).getFullYear();
-        var month = new Date(timestamp).getMonth();
-        var monthName = defaultConfig.monthNames[month];
-        var day = new Date(timestamp).getDate();
-
-        return day + ' ' + monthName + ' ' + year;
-    }
 
     function $(selector, scope) {
         var currentScope = document;
@@ -353,11 +352,11 @@
         self.resetInput();
 
         if (start) {
-            input.value = startLabelTxt + formatDate(start);
+            input.value = startLabelTxt + dateHelper.formatDate(start);
         }
 
         if (end) {
-            input.value += endLabelTxt + formatDate(end);
+            input.value += endLabelTxt + dateHelper.formatDate(end);
         }
     };
 
@@ -623,22 +622,161 @@
         var elementSelector = self.config.elementSelector || defaultConfig.elementSelector;
         var elements = $(elementSelector);
 
-        self.createMainContainer();
+        function calculatePosition(e) {
+            var target = e.target;
+
+            self.config.element.style.top = target.offsetTop + target.offsetHeight  + 'px';
+            self.config.element.style.left = target.offsetLeft + 'px';
+        }
+
+        function createMainContainer() {
+            var mainContainer = $(defaultConfig.calendarContainer)[0];
+
+            if (!mainContainer) {
+                mainContainer = $.createElement();
+                mainContainer.classList.add(defaultConfig.calendarContainer.slice(1), 'hide');
+
+                document.body.appendChild(mainContainer);
+            }
+
+            self.config.element = mainContainer;
+        }
+
+        function render() {
+            self.month = self.config.month;
+            self.year = self.config.year;
+
+            resetCalendarContainer();
+            createCalendarContainer();
+            initFragments();
+
+            self.fragmentsManager.renderAllFragments();
+
+            initListeners();
+
+            var inputs = $('input.js-has-drp');
+
+            inputs.forEach(function(input) {
+                input.classList.remove('shown');
+            });
+
+            self.config.input.classList.add('shown');
+
+            function resetCalendarContainer() {
+                self.config.element.innerHTML = '';
+            }
+
+            function createCalendarContainer() {
+                var mainContainer = self.config.element;
+                var field = $.createElement();
+
+                mainContainer.classList.add('js-has-drp');
+
+                field.classList.add('js-sides-container', 'drp-sides-container', 'display-table', 'parent-size');
+                mainContainer.appendChild(field);
+            }
+
+            function initFragments() {
+                var currentMonth = self.month;
+                var currentYear = self.year;
+                var fragmentsNumber = self.config.fragmentsNumber;
+
+                self.fragmentsManager.fragments = {};
+
+                while (fragmentsNumber--) {
+                    var fragmentContainer = self.fragmentsFactory.creteFragmentContainer(currentMonth, currentYear);
+                    var container = $.createElement();
+                    var tableCaption = self.fragmentsFactory.createTableCaption(currentMonth, currentYear);
+                    var table = self.fragmentsFactory.creteFragment(currentMonth, currentYear);
+
+                    container.classList.add('display-table-cell');
+
+                    container.appendChild(tableCaption);
+                    container.appendChild(table);
+
+                    fragmentContainer.appendChild(container);
+
+                    self.fragmentsManager.setFragments({
+                        year: currentYear,
+                        monthIndex: currentMonth,
+                        fragmentHtml: fragmentContainer,
+                        containerClassName: '.js-side-' + currentMonth
+                    });
+
+                    if (currentMonth < defaultConfig.LAST_MONTH_INDEX) {
+                        currentMonth++;
+                    }
+                    else {
+                        currentYear++;
+                        currentMonth = 0;
+                    }
+                }
+            }
+
+            function initListeners() {
+                initCellHoverEffect();
+            }
+
+            function initCellHoverEffect() {
+                var mainContainer = self.config.element;
+                var sidesContainer = $('.js-sides-container', mainContainer)[0];
+
+                sidesContainer.addEventListener('mouseover', function(e) {
+                    var start = self.fragmentsManager.selectedDateRange.start;
+                    var end = self.fragmentsManager.selectedDateRange.end;
+
+                    if (start && !end) {
+                        var target = e.target;
+                        var targetClassList = target.classList;
+                        var targetClassListArr = Array.prototype.slice.call(targetClassList);
+
+                        if (targetClassListArr.indexOf('day') >= 0) {
+                            var timestamp = parseInt(e.target.getAttribute('data-timestamp'), 10);
+
+                            hoverCells(timestamp);
+                        }
+                    }
+                });
+
+                function hoverCells(timestamp) {
+                    var mainContainer = self.config.element;
+                    var sidesContainer = $('.js-sides-container', mainContainer);
+                    var cells = $('.day', sidesContainer);
+
+                    cells.forEach(function(cell) {
+                        var cellTimestamp = parseInt(cell.getAttribute('data-timestamp'), 10);
+                        var start = self.fragmentsManager.selectedDateRange.start;
+
+                        if (cellTimestamp < timestamp && cellTimestamp > start) {
+                            cell.classList.add('hovered');
+                        }
+                        else if (cellTimestamp > timestamp && cellTimestamp < start) {
+                            cell.classList.add('hovered');
+                        }
+                        else {
+                            cell.classList.remove('hovered');
+                        }
+                    });
+                }
+            }
+        }
+
+        createMainContainer();
 
         elements.forEach(function(element) {
             self.config.input = element;
             self.config.input.classList.add('js-has-drp');
 
-            self.eventHandler = function(e) {
+            self.events= function(e) {
                 if (self.config.input.classList.contains('js-has-drp')) {
                     if (!self.config.input.classList.contains('shown')) {
-                        self.calculatePosition(e);
-                        self.render();
+                        calculatePosition(e);
+                        render();
                     }
                 }
             };
 
-            element.addEventListener('click', self.eventHandler);
+            element.addEventListener('click', self.events);
         });
 
         return this;
@@ -646,153 +784,22 @@
 
     Calendar.fn = Calendar.prototype;
 
-    Calendar.fn.calculatePosition = function(e) {
+    Calendar.fn.getInterval = function() {
         var self = this;
-        var target = e.target;
+        var selectedDateRange = self.fragmentsManager.selectedDateRange;
 
-        self.config.element.style.top = target.offsetTop + target.offsetHeight  + 'px';
-        self.config.element.style.left = target.offsetLeft + 'px';
-    };
-
-    Calendar.fn.createMainContainer = function() {
-        var self = this;
-        var mainContainer = $(defaultConfig.calendarContainer)[0];
-
-        if (!mainContainer) {
-            mainContainer = $.createElement();
-            mainContainer.classList.add(defaultConfig.calendarContainer.slice(1), 'hide');
-
-            document.body.appendChild(mainContainer);
-        }
-
-        self.config.element = mainContainer;
-    };
-
-    Calendar.fn.render = function() {
-        var self = this;
-
-        self.month = self.config.month;
-        self.year = self.config.year;
-
-        self.resetCalendarContainer();
-        self.createCalendarContainer();
-        self.initFragments();
-
-        self.fragmentsManager.renderAllFragments();
-
-        self.initListeners();
-
-        var inputs = $('input.js-has-drp');
-
-        inputs.forEach(function(input) {
-            input.classList.remove('shown');
-        });
-
-        self.config.input.classList.add('shown');
-    };
-
-    Calendar.fn.resetCalendarContainer = function() {
-        this.config.element.innerHTML = '';
-    };
-
-    Calendar.fn.createCalendarContainer = function() {
-        var self = this;
-        var mainContainer = self.config.element;
-        var field = $.createElement();
-
-        mainContainer.classList.add('js-has-drp');
-
-        field.classList.add('js-sides-container', 'drp-sides-container', 'display-table', 'parent-size');
-        mainContainer.appendChild(field);
-    };
-
-    Calendar.fn.initFragments = function() {
-        var self = this;
-        var currentMonth = self.month;
-        var currentYear = self.year;
-        var fragmentsNumber = self.config.fragmentsNumber;
-
-        self.fragmentsManager.fragments = {};
-
-        while (fragmentsNumber--) {
-            var fragmentContainer = self.fragmentsFactory.creteFragmentContainer(currentMonth, currentYear);
-            var container = $.createElement();
-            var tableCaption = self.fragmentsFactory.createTableCaption(currentMonth, currentYear);
-            var table = self.fragmentsFactory.creteFragment(currentMonth, currentYear);
-
-            container.classList.add('display-table-cell');
-
-            container.appendChild(tableCaption);
-            container.appendChild(table);
-
-            fragmentContainer.appendChild(container);
-
-            self.fragmentsManager.setFragments({
-                year: currentYear,
-                monthIndex: currentMonth,
-                fragmentHtml: fragmentContainer,
-                containerClassName: '.js-side-' + currentMonth
-            });
-
-            if (currentMonth < defaultConfig.LAST_MONTH_INDEX) {
-                currentMonth++;
-            }
-            else {
-                currentYear++;
-                currentMonth = 0;
-            }
+        return {
+            start: selectedDateRange.start,
+            end: selectedDateRange.end
         }
     };
 
-    Calendar.fn.initListeners = function() {
+    Calendar.fn.destroy = function() {
         var self = this;
+        var input = self.config.input;
 
-        self.initCellHoverEffect();
-    };
-
-    Calendar.fn.initCellHoverEffect = function() {
-        var self = this;
-        var mainContainer = self.config.element;
-        var sidesContainer = $('.js-sides-container', mainContainer)[0];
-
-        sidesContainer.addEventListener('mouseover', function(e) {
-            var start = self.fragmentsManager.selectedDateRange.start;
-            var end = self.fragmentsManager.selectedDateRange.end;
-
-            if (start && !end) {
-                var target = e.target;
-                var targetClassList = target.classList;
-                var targetClassListArr = Array.prototype.slice.call(targetClassList);
-
-                if (targetClassListArr.indexOf('day') >= 0) {
-                    var timestamp = parseInt(e.target.getAttribute('data-timestamp'), 10);
-
-                    self.hoverCells(timestamp);
-                }
-            }
-        });
-    };
-
-    Calendar.fn.hoverCells = function(timestamp) {
-        var self = this;
-        var mainContainer = self.config.element;
-        var sidesContainer = $('.js-sides-container', mainContainer);
-        var cells = $('.day', sidesContainer);
-
-        cells.forEach(function(cell) {
-            var cellTimestamp = parseInt(cell.getAttribute('data-timestamp'), 10);
-            var start = self.fragmentsManager.selectedDateRange.start;
-
-            if (cellTimestamp < timestamp && cellTimestamp > start) {
-                cell.classList.add('hovered');
-            }
-            else if (cellTimestamp > timestamp && cellTimestamp < start) {
-                cell.classList.add('hovered');
-            }
-            else {
-                cell.classList.remove('hovered');
-            }
-        });
+        input.removeEventListener('click', self.events);
+        input.classList. remove('js-has-drp');
     };
 
     function fadeIn(el, speed) {
@@ -843,7 +850,7 @@
         tick();
     }
 
-     function toggleDateRangePicker(e) {
+    function toggleDateRangePicker(e) {
         var element = e.target;
 
         if (element) {
@@ -871,14 +878,6 @@
     }
 
     document.addEventListener('click', toggleDateRangePicker);
-
-    Calendar.fn.destroy = function() {
-        var self = this;
-        var input = self.config.input;
-
-        input.removeEventListener('click', self.eventHandler);
-        input.classList. remove('js-has-drp');
-    };
 
     return Calendar;
 }));
