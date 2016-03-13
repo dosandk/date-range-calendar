@@ -1,6 +1,8 @@
 .idea
-app/css
+#app/css
 .sass-cache
 bower_components
 node_modules
 bower.json
+app/static.html
+app/index.html
