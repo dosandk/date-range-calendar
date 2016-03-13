@@ -1,6 +1,6 @@
 .drp-container {
     position: absolute;
-    z-index: 1;
+    z-index: 9999;
     opacity: 0;
     top: 0;
     left: 0;
@@ -110,13 +110,5 @@
 
     .active {
         border: 1px solid #fe6666;
-    }
-
-    .hide {
-        display: none;
-    }
-
-    .invisible {
-        visibility: hidden;
     }
 }
