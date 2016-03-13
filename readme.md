@@ -18,10 +18,10 @@ Or, if you prefer CommonJS:
 var dateRangePicker = require("date-range-picker");
 ```
 Or, you can simple add next lines to your page:
-
-    <link rel="stylesheet" href="drp.min.css" />
-    <script src="date-range-picker"></script>
-
+```html
+<link rel="stylesheet" href="drp.min.css" />
+<script src="date-range-picker"></script>
+```
 ## API documentation
 ### Configuration
 ### Methods
