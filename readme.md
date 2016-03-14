@@ -29,7 +29,7 @@ Or, you can simple add next lines to your page:
 ### Configuration
 
 #### elementSelector
-To associated input with date-range-picker you should set value to elementSelector
+To associated input with date-range-picker you should set value to `elementSelector`
 
 ```javascript
 var dateRangePicker = new DateRangePicker({
@@ -37,7 +37,7 @@ var dateRangePicker = new DateRangePicker({
 });
 ```
 #### year
-Parameter "year" allows to set a year for the calendar.
+Parameter `year` allows to set a start year for the calendar.
 First month will be current.
 
 ```javascript
@@ -46,7 +46,7 @@ var dateRangePicker = new DateRangePicker({
 });
 ```
 #### month
-Parameter "month" allows to set a month for the calendar.
+Parameter `month` allows to set a start month for the calendar.
 
 ```javascript
 var dateRangePicker = new DateRangePicker({
@@ -54,7 +54,7 @@ var dateRangePicker = new DateRangePicker({
 });
 ```
 #### fragmentsNumber
-Parameter "fragmentsNumber" allows to set a number of months for the calendar.
+Parameter `fragmentsNumber` allows to set a number of months for the calendar.
 
 ```javascript
 var dateRangePicker = new DateRangePicker({
