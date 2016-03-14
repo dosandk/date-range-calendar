@@ -11,28 +11,28 @@ gulp.task('browserSync', function () {
         //proxy: "localhost:4000/blog/"
     });
     // Reloads page when some of the already built files changed:
-    gulp.watch('app/**/*.*').on('change', browserSync.reload);
+    gulp.watch('src/**/*.*').on('change', browserSync.reload);
 });
 
 gulp.task('compile-scss', function() {
-    return gulp.src('./app/scss/**/*.scss')
+    return gulp.src('./src/scss/**/*.scss')
         .pipe(compass({
             config_file: './config.rb',
-            css: 'app/css',
-            sass: 'app/scss'
+            css: 'src/css',
+            sass: 'src/scss'
         }))
-        .pipe(gulp.dest('./app/css'));
+        .pipe(gulp.dest('./src/css'));
 });
 
 gulp.task('build:css', ['clean', 'compile-scss'], function() {
-    gulp.src(['./app/css/**/*.css'])
+    gulp.src(['./src/css/**/*.css'])
         .pipe(concat('drp.min.css'))
         .pipe(minify())
         .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('build:js', ['clean'], function() {
-    gulp.src(['./app/js/**/*.js'])
+    gulp.src(['./src/js/**/*.js'])
         .pipe(gulp.dest('./dist'));
 });
 
