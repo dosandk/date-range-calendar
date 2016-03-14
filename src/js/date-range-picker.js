@@ -654,14 +654,6 @@
 
             initListeners();
 
-            var inputs = $('input.js-has-drp');
-
-            inputs.forEach(function(input) {
-                input.classList.remove('shown');
-            });
-
-            self.config.input.classList.add('shown');
-
             function resetCalendarContainer() {
                 self.config.element.innerHTML = '';
             }
@@ -767,12 +759,18 @@
             self.config.input = element;
             self.config.input.classList.add('js-has-drp');
 
-            self.events= function(e) {
-                if (self.config.input.classList.contains('js-has-drp')) {
-                    if (!self.config.input.classList.contains('shown')) {
-                        calculatePosition(e);
-                        render();
-                    }
+            self.events = function(e) {
+                var classList = self.config.input.classList;
+                var inputs = $('input.js-has-drp');
+
+                inputs.forEach(function(input) {
+                    input.classList.remove('shown');
+                });
+
+                if (classList.contains('js-has-drp') && !classList.contains('shown')) {
+                    calculatePosition(e);
+                    render();
+                    self.config.input.classList.add('shown');
                 }
             };
 
@@ -797,7 +795,7 @@
         var input = self.config.input;
 
         input.removeEventListener('click', self.events);
-        input.classList. remove('js-has-drp');
+        input.classList.remove('js-has-drp');
     };
 
     function fadeIn(el, speed) {
@@ -855,22 +853,24 @@
             var showMainContainer = false;
             var mainContainer = $(defaultConfig.calendarContainer)[0];
 
-            if (element != document && element != document.body) {
-                while (element) {
-                    if (element.classList && (element.classList.contains('js-has-drp') || element.classList.contains('js-nav-elem'))) {
-                        showMainContainer = true;
-                        break;
+            if (typeof mainContainer !== 'undefined') {
+                if (element != document && element != document.body) {
+                    while (element) {
+                        if (element.classList && (element.classList.contains('js-has-drp') || element.classList.contains('js-nav-elem'))) {
+                            showMainContainer = true;
+                            break;
+                        }
+
+                        element = element.parentNode
                     }
-
-                    element = element.parentNode
                 }
-            }
 
-            if (showMainContainer) {
-                fadeIn(mainContainer);
-            }
-            else {
-                fadeOut(mainContainer);
+                if (showMainContainer) {
+                    fadeIn(mainContainer);
+                }
+                else {
+                    fadeOut(mainContainer);
+                }
             }
         }
     }

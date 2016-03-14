@@ -28,16 +28,8 @@ Or, you can simple add next lines to your page:
 ## API documentation
 ### Configuration
 
-"Date-range-picker" constructed without parameters is trying to find input with class="js-drp-input"
-and associating it with date-range-picker calendar. 
-Calendar will be created with 2 month intervals - current and next.
-
-```javascript
-var dateRangePicker = new DateRangePicker();
-```
-
 #### elementSelector
-You can set the specific selector for input.
+To associated input with date-range-picker you should set value to elementSelector
 
 ```javascript
 var dateRangePicker = new DateRangePicker({

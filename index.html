@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Date-range-picker</title>
+    <link rel="stylesheet" type="text/css" href="assets/reset.css"/>
+    <link rel="stylesheet" type="text/css" href="assets/gh-pages.css"/>
+    <link rel="stylesheet" type="text/css" href="assets/prism.css"/>
+    <link rel="stylesheet" type="text/css" href="dist/drp.min.css"/>
+
+    <script src="assets/prism.js"></script>
+    <script src="dist/date-range-picker.js"></script>
+</head>
+<body>
+    <main>
+        <div class="main-wrapper">
+            <h1>Date-range-picker examples</h1>
+            <div class="main-container">
+                <div class="container">
+                    <h3>Set input selector:</h3>
+                    <form>
+                        <input class="my-selector input-txt" type="text" placeholder="date-range-picker"/>
+                    </form>
+            <pre><code class="language-javascript">
+                var dateRangePicker = new DateRangePicker({
+                    elementSelector: '.my-selector',
+                });
+            </code></pre>
+                </div>
+                <div class="container">
+                    <h3>Set start month:</h3>
+                    <form>
+                        <input class="start-month-example input-txt" type="text" placeholder="date-range-picker"/>
+                    </form>
+            <pre><code class="language-javascript">
+                var dateRangePicker = new DateRangePicker({
+                    elementSelector: '.start-month-example',
+                    month: 10
+                });
+            </code></pre>
+                </div>
+                <div class="container">
+                    <h3>Set start year:</h3>
+                    <form>
+                        <input class="start-year-example input-txt" type="text" placeholder="date-range-picker"/>
+                    </form>
+            <pre><code class="language-javascript">
+                var dateRangePicker = new DateRangePicker({
+                    elementSelector: '.start-year-example',
+                    year: 2019
+                });
+            </code></pre>
+                </div>
+
+                <div class="container">
+                    <h3>Set start year:</h3>
+                    <form>
+                        <input class="fragments-numbers-example-1 input-txt" type="text" placeholder="months number 1"/>
+                        <input class="fragments-numbers-example-3 input-txt" type="text" placeholder="months number 3"/>
+                        <input class="fragments-numbers-example-4 input-txt" type="text" placeholder="months number 4"/>
+                    </form>
+                    <pre><code class="language-javascript">
+                        var dateRangePicker = new DateRangePicker({
+                            elementSelector: '.fragments-numbers-example-1',
+                            fragmentsNumber: 1
+                        });
+                    </code></pre>
+                    <pre><code class="language-javascript">
+                        var dateRangePicker = new DateRangePicker({
+                            elementSelector: '.fragments-numbers-example-3',
+                            fragmentsNumber: 3
+                        });
+                    </code></pre>
+                    <pre><code class="language-javascript">
+                        var dateRangePicker = new DateRangePicker({
+                            elementSelector: '.fragments-numbers-example-4',
+                            fragmentsNumber: 4
+                        });
+                    </code></pre>
+                </div>
+            </div>
+        </div>
+    </main>
+<script>
+    var selectorExample = new DateRangePicker({
+        elementSelector: '.my-selector'
+    });
+
+    var startMonthExample = new DateRangePicker({
+        elementSelector: '.start-month-example',
+        month: 10
+    });
+
+    var startYearExample = new DateRangePicker({
+        elementSelector: '.start-year-example',
+        year: 2019
+    });
+
+    var fragmentsNumbersExample1 = new DateRangePicker({
+        elementSelector: '.fragments-numbers-example-1',
+        fragmentsNumber: 1
+    });
+
+    var fragmentsNumbersExample3 = new DateRangePicker({
+        elementSelector: '.fragments-numbers-example-3',
+        fragmentsNumber: 3
+    });
+
+    var fragmentsNumbersExample4 = new DateRangePicker({
+        elementSelector: '.fragments-numbers-example-4',
+        fragmentsNumber: 4
+    });
+</script>
+
+</body>
+</html>
