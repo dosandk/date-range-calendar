@@ -5,8 +5,8 @@
     else if (typeof exports !== 'undefined' && typeof module === 'object') {
         module.exports = factory();
     }
-    else if (typeof window.Calendar === 'undefined' || typeof window.Calendar !== 'function') {
-        root.Calendar = factory();
+    else if (typeof window.DateRangePicker === 'undefined' || typeof window.DateRangePicker !== 'function') {
+        root.DateRangePicker = factory();
     }
 
 }(this, function() {
@@ -56,7 +56,7 @@
         LAST_MONTH_INDEX: 11,
         input: null,
         element: null,
-        elementSelector: '.date-range-picker',
+        elementSelector: '.js-drp-input',
         calendarContainer: '.js-drp-container',
         year: new Date().getFullYear(),
         month: new Date().getMonth(),
@@ -612,7 +612,7 @@
         return container;
     };
 
-    var Calendar = function(config) {
+    var DateRangePicker = function(config) {
         var self = this;
 
         self.config = extendConfig(config);
@@ -782,7 +782,7 @@
         return this;
     };
 
-    Calendar.prototype.getInterval = function() {
+    DateRangePicker.prototype.getInterval = function() {
         var self = this;
         var selectedDateRange = self.fragmentsManager.selectedDateRange;
 
@@ -792,7 +792,7 @@
         }
     };
 
-    Calendar.prototype.destroy = function() {
+    DateRangePicker.prototype.destroy = function() {
         var self = this;
         var input = self.config.input;
 
@@ -877,5 +877,5 @@
 
     document.addEventListener('click', toggleDateRangePicker);
 
-    return Calendar;
+    return DateRangePicker;
 }));
