@@ -80,7 +80,7 @@ var dateRangePicker = new DateRangePicker({
 
 ### Methods
 
-#### destroy
+#### destroy()
 This method removes connection between input and calendar.
 
 ```javascript
@@ -89,7 +89,7 @@ var dateRangePicker = new DateRangePicker();
 dateRangePicker.destroy();
 ```
 
-#### getInterval
+#### getInterval()
 This method returns object with start and end dates timestamps.
 
 ```javascript
