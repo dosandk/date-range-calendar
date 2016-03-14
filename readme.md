@@ -4,8 +4,8 @@ without dependencies that adds choosing date ranges functionality to your pages.
 By default, the Date-range-picker calendar opens in a overlay when 
 the associated text field gains focus.
 
-## Demo
-!["drp-preview"](https://raw.githubusercontent.com/dosandk/date-range-picker/master/assets/drp-preview.png)
+## [Demo] (http://dosandk.github.io/date-range-picker)
+[!["drp-preview"](https://raw.githubusercontent.com/dosandk/date-range-picker/master/assets/drp-preview.png)] (http://dosandk.github.io/date-range-picker)
 
 ## Install
 Date-range-picker was developed by using UMD pattern.
