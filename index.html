@@ -12,8 +12,8 @@
     <script src="dist/date-range-picker.js"></script>
 </head>
 <body>
-    <main>
-        <div class="main-wrapper">
+    <main class="main">
+        <div class="main-inner-wrapper">
             <h1>Date-range-picker examples</h1>
             <div class="main-container">
                 <div class="container">
@@ -81,36 +81,47 @@
             </div>
         </div>
     </main>
-<script>
-    var selectorExample = new DateRangePicker({
-        elementSelector: '.my-selector'
-    });
 
-    var startMonthExample = new DateRangePicker({
-        elementSelector: '.start-month-example',
-        month: 10
-    });
+    <script>
+        var selectorExample = new DateRangePicker({
+            elementSelector: '.my-selector'
+        });
 
-    var startYearExample = new DateRangePicker({
-        elementSelector: '.start-year-example',
-        year: 2019
-    });
+        var startMonthExample = new DateRangePicker({
+            elementSelector: '.start-month-example',
+            month: 10
+        });
 
-    var fragmentsNumbersExample1 = new DateRangePicker({
-        elementSelector: '.fragments-numbers-example-1',
-        fragmentsNumber: 1
-    });
+        var startYearExample = new DateRangePicker({
+            elementSelector: '.start-year-example',
+            year: 2019
+        });
 
-    var fragmentsNumbersExample3 = new DateRangePicker({
-        elementSelector: '.fragments-numbers-example-3',
-        fragmentsNumber: 3
-    });
+        var fragmentsNumbersExample1 = new DateRangePicker({
+            elementSelector: '.fragments-numbers-example-1',
+            fragmentsNumber: 1
+        });
 
-    var fragmentsNumbersExample4 = new DateRangePicker({
-        elementSelector: '.fragments-numbers-example-4',
-        fragmentsNumber: 4
-    });
-</script>
+        var fragmentsNumbersExample3 = new DateRangePicker({
+            elementSelector: '.fragments-numbers-example-3',
+            fragmentsNumber: 3
+        });
 
+        var fragmentsNumbersExample4 = new DateRangePicker({
+            elementSelector: '.fragments-numbers-example-4',
+            fragmentsNumber: 4
+        });
+    </script>
+
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-75138782-1', 'auto');
+        ga('send', 'pageview');
+
+    </script>
 </body>
 </html>
