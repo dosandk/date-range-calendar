@@ -877,5 +877,6 @@
 
     document.addEventListener('click', toggleDateRangePicker);
 
+    // TODO: change this return. Needs to process few selectors, so, please, add object wrapper to drp;
     return DateRangePicker;
 }));
